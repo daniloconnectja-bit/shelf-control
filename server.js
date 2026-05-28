@@ -11,7 +11,11 @@ const pool = new Pool({
 });
 
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+// Serve static files from 'public' folder or root (fallback)
+const staticDir = require('fs').existsSync(path.join(__dirname, 'public'))
+  ? path.join(__dirname, 'public')
+  : __dirname;
+app.use(express.static(staticDir));
 
 // ─── SEED DATA ────────────────────────────────────────────────────────────────
 const seedData = [
@@ -128,7 +132,7 @@ app.delete('/api/items/:id', async (req, res) => {
 
 // SPA fallback
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(staticDir, 'index.html'));
 });
 
 // ─── START ────────────────────────────────────────────────────────────────────
