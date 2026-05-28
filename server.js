@@ -1,9 +1,12 @@
 const express = require('express');
 const { Pool } = require('pg');
 const path = require('path');
+const fs = require('fs');
+const session = require('express-session');
 
 const app = express();
 const port = process.env.PORT || 3000;
+const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'connectfeliz';
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -11,8 +14,15 @@ const pool = new Pool({
 });
 
 app.use(express.json());
+app.use(session({
+  secret: process.env.SESSION_SECRET || 'shelf-secret-key-2024',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 8 * 60 * 60 * 1000 } // 8 horas
+}));
+
 // Serve static files from 'public' folder or root (fallback)
-const staticDir = require('fs').existsSync(path.join(__dirname, 'public'))
+const staticDir = fs.existsSync(path.join(__dirname, 'public'))
   ? path.join(__dirname, 'public')
   : __dirname;
 app.use(express.static(staticDir));
@@ -62,7 +72,6 @@ async function initDB() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-
   const { rows } = await pool.query('SELECT COUNT(*) AS c FROM items');
   if (parseInt(rows[0].c) === 0) {
     for (const s of seedData) {
@@ -75,7 +84,33 @@ async function initDB() {
   }
 }
 
-// ─── ROUTES ───────────────────────────────────────────────────────────────────
+// ─── AUTH MIDDLEWARE ──────────────────────────────────────────────────────────
+function requireAdmin(req, res, next) {
+  if (req.session && req.session.isAdmin) return next();
+  res.status(401).json({ error: 'Não autorizado' });
+}
+
+// ─── AUTH ROUTES ──────────────────────────────────────────────────────────────
+app.post('/api/login', (req, res) => {
+  const { password } = req.body;
+  if (password === ADMIN_PASSWORD) {
+    req.session.isAdmin = true;
+    res.json({ ok: true });
+  } else {
+    res.status(401).json({ error: 'Senha incorreta' });
+  }
+});
+
+app.post('/api/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ ok: true });
+});
+
+app.get('/api/me', (req, res) => {
+  res.json({ isAdmin: !!(req.session && req.session.isAdmin) });
+});
+
+// ─── ITEM ROUTES ──────────────────────────────────────────────────────────────
 app.get('/api/items', async (req, res) => {
   try {
     const { rows } = await pool.query('SELECT * FROM items ORDER BY rua, posicao, nivel DESC');
@@ -86,11 +121,10 @@ app.get('/api/items', async (req, res) => {
   }
 });
 
-app.post('/api/items', async (req, res) => {
+app.post('/api/items', requireAdmin, async (req, res) => {
   const { rua, posicao, nivel, nome, descricao } = req.body;
-  if (!rua || !posicao || !nivel || !nome) {
+  if (!rua || !posicao || !nivel || !nome)
     return res.status(400).json({ error: 'Campos obrigatórios: rua, posicao, nivel, nome' });
-  }
   try {
     const { rows } = await pool.query(
       'INSERT INTO items (rua, posicao, nivel, nome, descricao) VALUES ($1,$2,$3,$4,$5) RETURNING *',
@@ -103,7 +137,7 @@ app.post('/api/items', async (req, res) => {
   }
 });
 
-app.put('/api/items/:id', async (req, res) => {
+app.put('/api/items/:id', requireAdmin, async (req, res) => {
   const { nome, descricao } = req.body;
   if (!nome) return res.status(400).json({ error: 'Nome é obrigatório' });
   try {
@@ -119,7 +153,7 @@ app.put('/api/items/:id', async (req, res) => {
   }
 });
 
-app.delete('/api/items/:id', async (req, res) => {
+app.delete('/api/items/:id', requireAdmin, async (req, res) => {
   try {
     const { rowCount } = await pool.query('DELETE FROM items WHERE id=$1', [req.params.id]);
     if (!rowCount) return res.status(404).json({ error: 'Item não encontrado' });
@@ -136,11 +170,9 @@ app.get('*', (req, res) => {
 });
 
 // ─── START ────────────────────────────────────────────────────────────────────
-initDB()
-  .then(() => {
-    app.listen(port, () => console.log(`Shelf Control rodando na porta ${port}`));
-  })
-  .catch(err => {
-    console.error('Falha ao iniciar DB:', err);
-    process.exit(1);
-  });
+initDB().then(() => {
+  app.listen(port, () => console.log(`Shelf Control rodando na porta ${port}`));
+}).catch(err => {
+  console.error('Falha ao iniciar DB:', err);
+  process.exit(1);
+});

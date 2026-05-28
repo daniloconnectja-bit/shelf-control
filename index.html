@@ -213,6 +213,15 @@ mark{background:#fef08a;color:#713f12;border-radius:2px;padding:0 1px}
       <h1>Controle de Prateleiras</h1>
       <p>Rua A Frente · Rua A Fundo · Rua B · 18 posições</p>
     </div>
+    <div id="auth-block">
+      <span id="auth-status" style="font-size:12px;color:var(--text2);margin-right:8px"></span>
+      <button id="btn-login" onclick="openLoginModal()" style="padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text);display:flex;align-items:center;gap:5px">
+        <i class="ti ti-lock"></i> Entrar como Admin
+      </button>
+      <button id="btn-logout" onclick="doLogout()" style="display:none;padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text);display:none;align-items:center;gap:5px">
+        <i class="ti ti-logout"></i> Sair
+      </button>
+    </div>
   </div>
   <div id="search-row">
     <div id="search-wrap">
@@ -272,6 +281,21 @@ mark{background:#fef08a;color:#713f12;border-radius:2px;padding:0 1px}
 
 </div><!-- #app -->
 
+<!-- LOGIN MODAL -->
+<div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;align-items:center;justify-content:center">
+  <div class="modal" style="width:320px">
+    <h3><i class="ti ti-lock" style="margin-right:6px"></i>Acesso Admin</h3>
+    <p class="modal-sub">Digite a senha para habilitar edição</p>
+    <label for="login-pass">Senha</label>
+    <input id="login-pass" type="password" placeholder="Senha do admin" onkeydown="if(event.key==='Enter')doLogin()">
+    <p class="err-msg" id="err-login" style="display:none">Senha incorreta</p>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeLoginModal()">Cancelar</button>
+      <button class="btn-save" id="btn-login-save" onclick="doLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
 <!-- CRUD Modal -->
 <div id="modal-overlay">
   <div class="modal">
@@ -318,6 +342,7 @@ mark{background:#fef08a;color:#713f12;border-radius:2px;padding:0 1px}
 
 <script>
 // ─── STATE ────────────────────────────────────────────────────────────────────
+let isAdmin = false;
 let items = [];
 const RUA_LEVELS = { A:[3,2,1], AF:[1], B:[3,2,1] };
 let currentTab = 'A', searchTerm = '', searchResults = [], currentResultIdx = 0;
@@ -340,6 +365,61 @@ function toast(msg, isErr=false){
   el.className = 'show' + (isErr?' err':'');
   clearTimeout(el._t);
   el._t = setTimeout(()=>{ el.className=''; }, 2800);
+}
+
+// ─── AUTH UI ──────────────────────────────────────────────────────────────────
+function updateAuthUI() {
+  const btnLogin  = document.getElementById('btn-login');
+  const btnLogout = document.getElementById('btn-logout');
+  const status    = document.getElementById('auth-status');
+  if (isAdmin) {
+    btnLogin.style.display  = 'none';
+    btnLogout.style.display = 'flex';
+    status.textContent = '🔓 Admin';
+    status.style.color = 'var(--rua-af)';
+  } else {
+    btnLogin.style.display  = 'flex';
+    btnLogout.style.display = 'none';
+    status.textContent = '👁 Somente leitura';
+    status.style.color = 'var(--text2)';
+  }
+}
+
+function openLoginModal() {
+  document.getElementById('login-pass').value = '';
+  document.getElementById('err-login').style.display = 'none';
+  document.getElementById('login-overlay').style.display = 'flex';
+  setTimeout(() => document.getElementById('login-pass').focus(), 100);
+}
+
+function closeLoginModal() {
+  document.getElementById('login-overlay').style.display = 'none';
+}
+
+async function doLogin() {
+  const password = document.getElementById('login-pass').value;
+  const btn = document.getElementById('btn-login-save');
+  btn.disabled = true; btn.textContent = 'Entrando...';
+  try {
+    await api('POST', '/api/login', { password });
+    isAdmin = true;
+    closeLoginModal();
+    updateAuthUI();
+    render();
+    toast('Modo admin ativado');
+  } catch(e) {
+    document.getElementById('err-login').style.display = 'block';
+  } finally {
+    btn.disabled = false; btn.textContent = 'Entrar';
+  }
+}
+
+async function doLogout() {
+  await api('POST', '/api/logout', {});
+  isAdmin = false;
+  updateAuthUI();
+  render();
+  toast('Sessão encerrada');
 }
 
 // ─── API ──────────────────────────────────────────────────────────────────────
@@ -389,7 +469,7 @@ function renderGrid(rua){
             <span class="level-dot"></span>
             <span class="level-label">${getLevelLabel(nivel)}</span>
             ${hasItems?`<span class="level-count">${lvItems.length}</span>`:''}
-            <button class="level-add" onclick="event.stopPropagation();openCreate('${rua}','${pos}',${nivel})"><i class="ti ti-plus"></i></button>
+            ${isAdmin ? `<button class="level-add" onclick="event.stopPropagation();openCreate('${rua}','${pos}',${nivel})"><i class="ti ti-plus"></i></button>` : ''}
             ${hasItems?`<i class="ti ti-chevron-down level-chevron"></i>`:''}
           </div>
           <div class="level-items open" id="lvl-${rua}-${pos}-${nivel}">
@@ -399,10 +479,10 @@ function renderGrid(rua){
                   <div class="item-name">${hl(it.nome,searchTerm)}</div>
                   ${it.descricao?`<div class="item-desc">${hl(it.descricao,searchTerm)}</div>`:''}
                 </div>
-                <div class="item-actions">
+                ${isAdmin ? `<div class="item-actions">
                   <button class="item-btn" onclick="openEdit(${it.id})"><i class="ti ti-pencil"></i></button>
                   <button class="item-btn del" onclick="deleteItem(${it.id})"><i class="ti ti-trash"></i></button>
-                </div>
+                </div>` : ''}
               </div>`).join(''):`<div class="level-empty">Nenhum item</div>`}
           </div>
         </div>`;
@@ -714,6 +794,9 @@ document.getElementById('smodal-input').addEventListener('keydown',e=>{
 
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 (async ()=>{
+  const me = await api('GET', '/api/me').catch(()=>({isAdmin:false}));
+  isAdmin = me.isAdmin;
+  updateAuthUI();
   await loadItems();
   setTab('A');
 })();
