@@ -804,8 +804,4 @@ function goToResult(){
 document.getElementById('smodal-input').addEventListener('keydown',e=>{
   if(e.key==='ArrowDown'){ e.preventDefault(); smodalNav(1); }
   if(e.key==='ArrowUp'){ e.preventDefault(); smodalNav(-1); }
-  if(e.key==='Enter') goToResult();
-  if(e.key==='Escape') closeSearchModal();
-});
-
-// ─── INIT ─────
+  if(e.key==='Enter') goToResult(
