@@ -13,11 +13,11 @@
   --brand-dim:rgba(249,180,45,0.15);
   --rua-a:#3b82f6;--rua-b:#a78bfa;--rua-af:#34d399;
   --nivel-topo:#F9B42D;--nivel-topo-bg:rgba(249,180,45,0.12);--nivel-topo-border:rgba(249,180,45,0.35);
-  --nivel-meio:#34d399;--nivel-meio-bg:rgba(52,211,153,0.1);--nivel-meio-border:rgba(52,211,153,0.35);
-  --nivel-base:#818cf8;--nivel-base-bg:rgba(129,140,248,0.1);--nivel-base-border:rgba(129,140,248,0.35);
+  --nivel-meio:#2ecc71;--nivel-meio-bg:rgba(52,211,153,0.1);--nivel-meio-border:rgba(52,211,153,0.35);
+  --nivel-base:#a78bfa;--nivel-base-bg:rgba(129,140,248,0.1);--nivel-base-border:rgba(129,140,248,0.35);
   --hl:#F9B42D;--hl-bg:rgba(249,180,45,0.12);
   --surface:#1565C0;--surface2:#1055A8;--border:rgba(255,255,255,0.1);
-  --text:#ffffff;--text2:rgba(255,255,255,0.5);
+  --text:#ffffff;--text2:rgba(255,255,255,0.85);
   --radius-md:8px;--radius-lg:12px;
 }
 body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface2);min-height:100vh}
@@ -78,8 +78,8 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 .rua-badge.A{background:var(--rua-a);color:#fff}
 .rua-badge.B{background:var(--rua-b);color:#fff}
 .rua-badge.AF{background:var(--rua-af);color:#fff}
-.rua-header-text h2{font-size:16px;font-weight:600}
-.rua-header-text p{font-size:12px;color:var(--text2)}
+.rua-header-text h2{font-size:18px;font-weight:700;color:#fff}
+.rua-header-text p{font-size:12px;color:rgba(255,255,255,0.85)}
 .positions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
 
 .shelf-pos{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:box-shadow 0.15s}
@@ -102,11 +102,11 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 .level-add:hover{background:var(--surface2);color:var(--text)}
 .level-chevron{font-size:12px;color:var(--text2);transition:transform 0.15s;margin-left:2px}
 .level-row[data-nivel="3"] .level-dot{background:var(--nivel-topo)}
-.level-row[data-nivel="3"] .level-label{color:#92400e}
+.level-row[data-nivel="3"] .level-label{color:#F9B42D}
 .level-row[data-nivel="2"] .level-dot{background:var(--nivel-meio)}
-.level-row[data-nivel="2"] .level-label{color:#065f46}
+.level-row[data-nivel="2"] .level-label{color:#2ecc71}
 .level-row[data-nivel="1"] .level-dot{background:var(--nivel-base)}
-.level-row[data-nivel="1"] .level-label{color:#3730a3}
+.level-row[data-nivel="1"] .level-label{color:#a78bfa}
 .level-items{display:none;border-top:1px solid var(--border)}
 .level-items.open{display:block}
 .shelf-item{display:flex;align-items:center;padding:5px 8px;gap:6px;transition:background 0.1s;border-bottom:1px solid var(--border)}
@@ -114,14 +114,14 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 .shelf-item:hover{background:var(--surface2)}
 .shelf-item.highlighted{background:var(--hl-bg)!important;border-left:3px solid var(--hl);animation:pulse-hl 1.5s ease 2}
 @keyframes pulse-hl{0%,100%{background:var(--hl-bg)}50%{background:#ffedd5}}
-.item-name{flex:1;font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.item-desc{font-size:10px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-name{flex:1;font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.item-desc{font-size:11px;color:rgba(255,255,255,0.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item-actions{display:none;gap:2px}
 .shelf-item:hover .item-actions{display:flex}
 .item-btn{background:none;border:none;cursor:pointer;width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--text2)}
 .item-btn:hover{background:var(--surface2);color:var(--text)}
 .item-btn.del:hover{color:#dc2626}
-.level-empty{padding:5px 8px;font-size:11px;color:var(--text2);font-style:italic}
+.level-empty{padding:5px 8px;font-size:11px;color:rgba(255,255,255,0.6);font-style:italic}
 
 /* MODAL */
 #modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center}
@@ -164,9 +164,9 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 .badge-rua.B{background:var(--rua-b)}
 .badge-rua.AF{background:var(--rua-af);font-size:9px}
 .badge-nivel{font-size:10px;padding:1px 6px;border-radius:4px;text-align:center}
-.badge-nivel.n1{background:var(--nivel-base-bg);color:#3730a3;border:1px solid var(--nivel-base-border)}
-.badge-nivel.n2{background:var(--nivel-meio-bg);color:#065f46;border:1px solid var(--nivel-meio-border)}
-.badge-nivel.n3{background:var(--nivel-topo-bg);color:#92400e;border:1px solid var(--nivel-topo-border)}
+.badge-nivel.n1{background:rgba(167,139,250,0.2);color:#a78bfa;border:1px solid var(--nivel-base-border)}
+.badge-nivel.n2{background:rgba(46,204,113,0.15);color:#2ecc71;border:1px solid var(--nivel-meio-border)}
+.badge-nivel.n3{background:rgba(249,180,45,0.15);color:#F9B42D;border:1px solid var(--nivel-topo-border)}
 .sresult-info{flex:1;min-width:0}
 .sresult-name{font-size:13px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sresult-desc{font-size:11px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
@@ -180,9 +180,9 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 .loc-chip.rua-A{background:var(--rua-a);color:#fff}
 .loc-chip.rua-B{background:var(--rua-b);color:#fff}
 .loc-chip.rua-AF{background:var(--rua-af);color:#fff}
-.loc-chip.nivel-n3{background:var(--nivel-topo-bg);color:#92400e;border:1px solid var(--nivel-topo-border)}
-.loc-chip.nivel-n2{background:var(--nivel-meio-bg);color:#065f46;border:1px solid var(--nivel-meio-border)}
-.loc-chip.nivel-n1{background:var(--nivel-base-bg);color:#3730a3;border:1px solid var(--nivel-base-border)}
+.loc-chip.nivel-n3{background:rgba(249,180,45,0.15);color:#F9B42D;border:1px solid var(--nivel-topo-border)}
+.loc-chip.nivel-n2{background:rgba(46,204,113,0.15);color:#2ecc71;border:1px solid var(--nivel-meio-border)}
+.loc-chip.nivel-n1{background:rgba(167,139,250,0.2);color:#a78bfa;border:1px solid var(--nivel-base-border)}
 .loc-sep{color:var(--text2);font-size:12px}
 .sdetail-shelf-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-md);overflow:hidden}
 .sdetail-shelf-title{font-size:11px;font-weight:500;color:var(--text2);padding:8px 12px 6px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:0.5px}
@@ -257,7 +257,7 @@ mark{background:rgba(249,180,45,0.3);color:var(--brand);border-radius:2px;paddin
     <span class="tab-dot" style="background:var(--rua-a)"></span>Rua A — Frente
   </button>
   <button class="main-tab tab-af" data-tab="AF" onclick="setTab('AF')">
-    <span class="tab-dot" style="background:var(--rua-af)"></span>Rua A — Fundo
+    <span class="tab-dot" style="background:var(--rua-af)"></span>Rua A — Posterior
   </button>
   <button class="main-tab tab-b" data-tab="B" onclick="setTab('B')">
     <span class="tab-dot" style="background:var(--rua-b)"></span>Rua B
@@ -279,8 +279,8 @@ mark{background:rgba(249,180,45,0.3);color:var(--brand);border-radius:2px;paddin
   </div>
   <div id="sec-AF" class="rua-section">
     <div class="rua-header">
-      <div class="rua-badge AF">A<br><span style="font-size:9px;font-weight:400">Fundo</span></div>
-      <div class="rua-header-text"><h2>Rua A — Fundo</h2><p>18 posições · Somente Base</p></div>
+      <div class="rua-badge AF">A<br><span style="font-size:9px;font-weight:400">Post</span></div>
+      <div class="rua-header-text"><h2>Rua A — Posterior</h2><p>18 posições · Somente Base</p></div>
     </div>
     <div class="positions-grid" id="grid-AF"></div>
   </div>
@@ -589,7 +589,7 @@ document.addEventListener('keydown',e=>{
 // ─── CRUD ─────────────────────────────────────────────────────────────────────
 function openCreate(rua, posicao, nivel){
   modalMode='create'; modalCtx={rua, posicao, nivel};
-  const pl = rua==='AF'?`A-${posicao} Fundo`:`${rua}-${posicao}`;
+  const pl = rua==='AF'?`A-${posicao} Posterior`:`${rua}-${posicao}`;
   document.getElementById('modal-title').textContent='Adicionar Item';
   document.getElementById('modal-sub').textContent=`${pl} · ${getLevelLabel(nivel)}`;
   document.getElementById('modal-nome').value='';
@@ -604,7 +604,7 @@ function openCreate(rua, posicao, nivel){
 function openEdit(id){
   const item = items.find(i=>i.id===id); if(!item) return;
   modalMode='edit'; modalCtx={id};
-  const pl = item.rua==='AF'?`A-${item.posicao} Fundo`:`${item.rua}-${item.posicao}`;
+  const pl = item.rua==='AF'?`A-${item.posicao} Posterior`:`${item.rua}-${item.posicao}`;
   document.getElementById('modal-title').textContent='Editar Item';
   document.getElementById('modal-sub').textContent=`${pl} · ${getLevelLabel(item.nivel)}`;
   document.getElementById('modal-nome').value=item.nome;
@@ -720,9 +720,9 @@ function renderSmodalDetail(item, term){
   if(!item){ el.innerHTML=`<div class="sdetail-empty"><i class="ti ti-package"></i><span>Selecione um resultado</span></div>`; return; }
   const searchVal = term!==undefined?term:document.getElementById('smodal-input').value;
   const rua=item.rua; const posicao=item.posicao;
-  const posLabel=rua==='AF'?`A-${posicao} (Fundo)`:`${rua}-${posicao}`;
+  const posLabel=rua==='AF'?`A-${posicao} (Posterior)`:`${rua}-${posicao}`;
   const rc=rua==='AF'?'AF':rua;
-  const ruaLabel=rua==='AF'?'Rua A — Fundo':rua==='A'?'Rua A — Frente':'Rua B';
+  const ruaLabel=rua==='AF'?'Rua A — Posterior':rua==='A'?'Rua A — Frente':'Rua B';
   const levels=RUA_LEVELS[rua];
   const posItems=items.filter(i=>i.rua===rua&&i.posicao===posicao);
   const shelfRows=levels.map(nivel=>{
