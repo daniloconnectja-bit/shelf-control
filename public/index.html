@@ -16,7 +16,7 @@
   --nivel-meio:#34d399;--nivel-meio-bg:rgba(52,211,153,0.1);--nivel-meio-border:rgba(52,211,153,0.35);
   --nivel-base:#818cf8;--nivel-base-bg:rgba(129,140,248,0.1);--nivel-base-border:rgba(129,140,248,0.35);
   --hl:#F9B42D;--hl-bg:rgba(249,180,45,0.12);
-  --surface:#0d1e55;--surface2:#091640;--border:rgba(255,255,255,0.1);
+  --surface:#1565C0;--surface2:#1055A8;--border:rgba(255,255,255,0.1);
   --text:#ffffff;--text2:rgba(255,255,255,0.5);
   --radius-md:8px;--radius-lg:12px;
 }
@@ -35,11 +35,11 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 
 #app{display:flex;flex-direction:column;min-height:100vh}
 
-#header{background:#091640;border-bottom:1px solid rgba(249,180,45,0.2);padding:14px 20px;position:sticky;top:0;z-index:100}
+#header{background:#1055A8;border-bottom:1px solid rgba(249,180,45,0.2);padding:14px 20px;position:sticky;top:0;z-index:100}
 #header-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px;flex-wrap:wrap}
 #title-block{display:flex;align-items:center;gap:14px}
 #logo-mark{display:flex;align-items:center;gap:8px}
-#logo-icon{width:36px;height:36px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#091640;flex-shrink:0;font-family:Georgia,serif}
+#logo-icon{width:36px;height:36px;background:var(--brand);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#1055A8;flex-shrink:0;font-family:Georgia,serif}
 #logo-text{display:flex;flex-direction:column}
 #logo-text span:first-child{font-size:17px;font-weight:700;color:var(--brand);letter-spacing:-0.3px}
 #logo-text span:last-child{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:1.5px;text-transform:uppercase;margin-top:-1px}
@@ -57,10 +57,10 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 #search-nav button{background:none;border:none;cursor:pointer;padding:2px 5px;border-radius:4px;font-size:15px;color:var(--text)}
 #search-nav button:hover{background:var(--border)}
 .nav-count{font-weight:500;color:var(--text);font-size:13px}
-.btn-ver{margin-left:4px;padding:3px 10px;border:none;border-radius:var(--radius-md);background:var(--brand);color:#091640;font-size:11px;cursor:pointer;font-weight:700}
+.btn-ver{margin-left:4px;padding:3px 10px;border:none;border-radius:var(--radius-md);background:var(--brand);color:#1055A8;font-size:11px;cursor:pointer;font-weight:700}
 .btn-ver:hover{opacity:0.88}
 
-#tab-strip{display:flex;background:#091640;border-bottom:1px solid rgba(249,180,45,0.15);padding:0 20px;overflow-x:auto}
+#tab-strip{display:flex;background:#1055A8;border-bottom:1px solid rgba(249,180,45,0.15);padding:0 20px;overflow-x:auto}
 .main-tab{padding:9px 16px;font-size:13px;font-weight:500;border:none;cursor:pointer;background:transparent;color:rgba(255,255,255,0.4);border-bottom:2px solid transparent;transition:all 0.15s;display:flex;align-items:center;gap:6px;white-space:nowrap;flex-shrink:0}
 .main-tab:hover{color:rgba(255,255,255,0.8)}
 .main-tab.active{color:var(--brand);border-bottom-color:var(--brand)}
@@ -138,7 +138,7 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 .err-msg.show{display:block}
 .modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:16px}
 .btn-cancel{padding:7px 16px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:13px;cursor:pointer;background:var(--surface);color:var(--text)}
-.btn-save{padding:7px 16px;border:none;border-radius:var(--radius-md);font-size:13px;cursor:pointer;background:var(--brand);color:#091640;font-weight:700}
+.btn-save{padding:7px 16px;border:none;border-radius:var(--radius-md);font-size:13px;cursor:pointer;background:var(--brand);color:#1055A8;font-weight:700}
 .btn-save:hover{opacity:0.9}
 .btn-cancel:hover{background:rgba(255,255,255,0.06)}
 .btn-save:disabled{opacity:0.6;cursor:not-allowed}
@@ -202,11 +202,11 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--surface
 .smodal-footer-btns{display:flex;gap:6px}
 .sfbtn{padding:6px 14px;border:1px solid var(--border);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:var(--surface);color:var(--text);display:flex;align-items:center;gap:4px}
 .sfbtn:hover{background:var(--surface2)}
-.sfbtn.go{background:var(--brand);color:#091640;border-color:var(--brand);font-weight:700}
+.sfbtn.go{background:var(--brand);color:#1055A8;border-color:var(--brand);font-weight:700}
 .sfbtn.go:hover{opacity:0.88}
 mark{background:rgba(249,180,45,0.3);color:var(--brand);border-radius:2px;padding:0 2px}
-#loading{background:#091640}
-#toast{background:#0d1e55;border:1px solid rgba(249,180,45,0.3)}
+#loading{background:#1055A8}
+#toast{background:#1565C0;border:1px solid rgba(249,180,45,0.3)}
 #toast.err{background:#7f1d1d;border-color:#dc2626}
 </style>
 </head>
@@ -221,14 +221,7 @@ mark{background:rgba(249,180,45,0.3);color:var(--brand);border-radius:2px;paddin
 <div id="header">
   <div id="header-top">
     <div id="title-block">
-      <div id="logo-mark">
-        <div id="logo-icon">C</div>
-        <div id="logo-text">
-          <span>connect</span>
-          <span>Internet sem limites</span>
-        </div>
-      </div>
-      <div class="divider"></div>
+      <div class="divider" style="display:none"></div>
       <div>
         <h1>Controle de Prateleiras</h1>
         <p>Rua A · Rua B · 18 posições</p>
