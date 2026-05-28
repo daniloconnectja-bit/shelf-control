@@ -798,10 +798,18 @@ function goToResult(){
   if(idx>=0) currentResultIdx=idx;
   setTab(item.rua);
   closeSearchModal(); updateNavUI(); render();
-  setTimeout(()=>{ window.scrollTo({top:0,behavior:'smooth'}); },80);
-}
+  if(e.key==='Enter') goToResult();
+  if(e.key==='Escape') closeSearchModal();
+});
 
-document.getElementById('smodal-input').addEventListener('keydown',e=>{
-  if(e.key==='ArrowDown'){ e.preventDefault(); smodalNav(1); }
-  if(e.key==='ArrowUp'){ e.preventDefault(); smodalNav(-1); }
-  if(e.key==='Enter') goToResult(
+// ─── INIT ─────────────────────────────────────────────────────────────────────
+(async ()=>{
+  const me = await api('GET', '/api/me').catch(()=>({isAdmin:false}));
+  isAdmin = me.isAdmin;
+  updateAuthUI();
+  await loadItems();
+  setTab('A');
+})();
+</script>
+</body>
+</html>
