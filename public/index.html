@@ -210,6 +210,22 @@ mark{background:transparent;color:#ffffff;border-radius:2px;padding:0 2px;font-w
 #loading{background:#1055A8}
 #toast{background:#1565C0;border:1px solid rgba(249,180,45,0.3)}
 #toast.err{background:#7f1d1d;border-color:#dc2626}
+
+/* FOTO */
+.item-thumb{width:28px;height:28px;border-radius:4px;object-fit:cover;cursor:pointer;border:1px solid rgba(255,255,255,0.2);flex-shrink:0;transition:transform .15s}
+.item-thumb:hover{border-color:var(--brand);transform:scale(1.08)}
+.item-cam{background:none;border:none;cursor:pointer;width:20px;height:20px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:13px;color:rgba(255,255,255,0.35)}
+.item-cam:hover{color:var(--brand)}
+#photo-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:500;align-items:center;justify-content:center;flex-direction:column;gap:14px}
+#photo-overlay.open{display:flex}
+#photo-overlay img{max-width:90vw;max-height:76vh;border-radius:10px;box-shadow:0 8px 40px rgba(0,0,0,0.6)}
+#photo-overlay .photo-name{color:#fff;font-size:15px;font-weight:600;text-align:center;padding:0 20px}
+#photo-overlay .photo-close{position:absolute;top:16px;right:20px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);color:#fff;font-size:20px;cursor:pointer;border-radius:6px;padding:4px 12px}
+.upload-area{border:2px dashed rgba(255,255,255,0.2);border-radius:8px;padding:14px;text-align:center;cursor:pointer;margin-top:8px;transition:border-color .2s}
+.upload-area:hover{border-color:var(--brand)}
+.upload-area input{display:none}
+.upload-area p{font-size:12px;color:rgba(255,255,255,0.45);margin-top:4px}
+.foto-preview-img{width:100%;max-height:150px;object-fit:contain;border-radius:6px;margin-top:8px;display:none}
 </style>
 </head>
 <body>
@@ -348,6 +364,18 @@ mark{background:transparent;color:#ffffff;border-radius:2px;padding:0 2px;font-w
     <p class="err-msg" id="err-nome">Nome é obrigatório</p>
     <label for="modal-desc">Descrição</label>
     <textarea id="modal-desc" rows="3" placeholder="Descrição (opcional)" maxlength="400"></textarea>
+    <div id="foto-section" style="display:none;margin-top:12px">
+      <label>Foto do Item</label>
+      <img id="foto-preview-img" class="foto-preview-img" src="" alt="preview">
+      <div class="upload-area" onclick="document.getElementById('foto-file-input').click()">
+        <i class="ti ti-camera" style="font-size:22px;color:rgba(255,255,255,0.4)"></i>
+        <p>Clique para enviar uma foto (máx 5MB)</p>
+        <input type="file" id="foto-file-input" accept="image/*" onchange="onFotoSelected(this)">
+      </div>
+      <button id="btn-remove-foto" onclick="removeFoto()" style="display:none;margin-top:8px;background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);color:#ef4444;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;width:100%">
+        <i class="ti ti-trash"></i> Remover foto
+      </button>
+    </div>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
       <button class="btn-save" id="btn-save" onclick="saveModal()">Salvar</button>
@@ -527,11 +555,13 @@ function renderGrid(rua){
           <div class="level-items open" id="lvl-${rua}-${pos}-${nivel}">
             ${hasItems?lvItems.map(it=>`
               <div class="shelf-item${hlIds.has(it.id)?' highlighted':''}" id="item-${it.id}">
+                ${it.foto_url?`<img class="item-thumb" src="${it.foto_url}" alt="${it.nome}" onclick="openPhoto('${it.foto_url}','${it.nome.replace(/'/g,"\\'")}',event)">`:''}
                 <div style="flex:1;min-width:0">
                   <div class="item-name">${hl(it.nome,searchTerm)}</div>
                   ${it.descricao?`<div class="item-desc">${hl(it.descricao,searchTerm)}</div>`:''}
                 </div>
                 ${isAdmin ? `<div class="item-actions">
+                  ${!it.foto_url?`<button class="item-btn item-cam" title="Adicionar foto" onclick="openEdit(${it.id})"><i class="ti ti-camera"></i></button>`:''}
                   <button class="item-btn" onclick="openEdit(${it.id})"><i class="ti ti-pencil"></i></button>
                   <button class="item-btn del" onclick="deleteItem(${it.id})"><i class="ti ti-trash"></i></button>
                 </div>` : ''}
@@ -635,13 +665,14 @@ function openCreate(rua, posicao, nivel){
   document.getElementById('err-nome').classList.remove('show');
   document.getElementById('modal-nome').classList.remove('err');
   document.getElementById('btn-save').disabled=false;
+  document.getElementById('foto-section').style.display='none';
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('modal-nome').focus(),100);
 }
 
 function openEdit(id){
   const item = items.find(i=>i.id===id); if(!item) return;
-  modalMode='edit'; modalCtx={id};
+  modalMode='edit'; modalCtx={id, foto_url: item.foto_url||null};
   const pl = item.rua==='AF'?`A-${item.posicao} Posterior`:`${item.rua}-${item.posicao}`;
   document.getElementById('modal-title').textContent='Editar Item';
   document.getElementById('modal-sub').textContent=`${pl} · ${getLevelLabel(item.nivel)}`;
@@ -650,6 +681,13 @@ function openEdit(id){
   document.getElementById('err-nome').classList.remove('show');
   document.getElementById('modal-nome').classList.remove('err');
   document.getElementById('btn-save').disabled=false;
+  // Foto
+  document.getElementById('foto-section').style.display='block';
+  document.getElementById('foto-file-input').value='';
+  const previewImg = document.getElementById('foto-preview-img');
+  const btnRemove = document.getElementById('btn-remove-foto');
+  if(item.foto_url){ previewImg.src=item.foto_url; previewImg.style.display='block'; btnRemove.style.display='block'; }
+  else { previewImg.style.display='none'; previewImg.src=''; btnRemove.style.display='none'; }
   document.getElementById('modal-overlay').classList.add('open');
   setTimeout(()=>document.getElementById('modal-nome').focus(),100);
 }
@@ -678,7 +716,18 @@ async function saveModal(){
       const atualizado = await api('PUT',`/api/items/${modalCtx.id}`,{nome,descricao:descricao||null});
       const idx = items.findIndex(i=>i.id===modalCtx.id);
       if(idx>=0) items[idx]=atualizado;
-      toast('Item atualizado');
+      // Upload foto se selecionada
+      const fotoInput = document.getElementById('foto-file-input');
+      if(fotoInput.files[0]){
+        try {
+          const comFoto = await uploadFoto(modalCtx.id);
+          const i2 = items.findIndex(i=>i.id===modalCtx.id);
+          if(i2>=0) items[i2]=comFoto;
+          toast('Item e foto salvos!');
+        } catch(e){ toast('Item salvo, mas erro na foto', true); }
+      } else {
+        toast('Item atualizado');
+      }
     }
     if(searchTerm.trim()) doSearch(searchTerm);
     closeModal(); render();
@@ -920,6 +969,58 @@ document.getElementById('users-overlay').addEventListener('click', e => {
   if (e.target === e.currentTarget) closeUsersModal();
 });
 
+
+// ─── FOTO ─────────────────────────────────────────────────────────────────────
+function openPhoto(url, nome, event) {
+  if(event) event.stopPropagation();
+  document.getElementById('photo-img').src = url;
+  document.getElementById('photo-name').textContent = nome;
+  document.getElementById('photo-overlay').classList.add('open');
+}
+
+function closePhoto() {
+  document.getElementById('photo-overlay').classList.remove('open');
+  document.getElementById('photo-img').src = '';
+}
+
+function onFotoSelected(input) {
+  const file = input.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById('foto-preview-img');
+    img.src = e.target.result;
+    img.style.display = 'block';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function uploadFoto(itemId) {
+  const input = document.getElementById('foto-file-input');
+  if(!input.files[0]) return null;
+  const formData = new FormData();
+  formData.append('foto', input.files[0]);
+  const res = await fetch(`/api/items/${itemId}/foto`, { method:'POST', body: formData });
+  if(!res.ok) throw new Error('Erro no upload');
+  return res.json();
+}
+
+async function removeFoto() {
+  if(!modalCtx.id) return;
+  if(!confirm('Remover foto deste item?')) return;
+  try {
+    const updated = await fetch(`/api/items/${modalCtx.id}/foto`, {method:'DELETE'}).then(r=>r.json());
+    const idx = items.findIndex(i=>i.id===modalCtx.id);
+    if(idx>=0) items[idx] = updated;
+    modalCtx.foto_url = null;
+    document.getElementById('foto-preview-img').style.display='none';
+    document.getElementById('foto-preview-img').src='';
+    document.getElementById('btn-remove-foto').style.display='none';
+    document.getElementById('foto-file-input').value='';
+    toast('Foto removida');
+    render();
+  } catch(e) { toast('Erro ao remover foto', true); }
+}
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 (async ()=>{
   const me = await api('GET', '/api/me').catch(()=>({isAdmin:false,isMaster:false,username:''}));
@@ -931,5 +1032,12 @@ document.getElementById('users-overlay').addEventListener('click', e => {
   setTab('A');
 })();
 </script>
+<!-- PHOTO OVERLAY -->
+<div id="photo-overlay" onclick="if(event.target===this)closePhoto()">
+  <button class="photo-close" onclick="closePhoto()"><i class="ti ti-x"></i></button>
+  <img id="photo-img" src="" alt="">
+  <div class="photo-name" id="photo-name"></div>
+</div>
+
 </body>
 </html>

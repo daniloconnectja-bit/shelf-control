@@ -3,10 +3,21 @@ const { Pool } = require('pg');
 const path = require('path');
 const fs = require('fs');
 const session = require('express-session');
+const multer = require('multer');
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 
 const app = express();
 const port = process.env.PORT || 3000;
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || 'connectfeliz';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dtyvrpoue',
+  api_key:    process.env.CLOUDINARY_API_KEY    || '235998134975168',
+  api_secret: process.env.CLOUDINARY_API_SECRET || 'lIy_wyJ_W-PZ6ftL5qta5afSH74'
+});
+
+const upload = multer({ storage: multer.memoryStorage(), limits: { fileSize: 5 * 1024 * 1024 } });
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
@@ -68,6 +79,7 @@ async function initDB() {
       nivel     INTEGER      NOT NULL CHECK (nivel IN (1,2,3)),
       nome      VARCHAR(120) NOT NULL,
       descricao VARCHAR(400),
+      foto_url  TEXT,
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
@@ -81,6 +93,9 @@ async function initDB() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+
+  // Migration: adiciona coluna foto_url se não existir
+  await pool.query(`ALTER TABLE items ADD COLUMN IF NOT EXISTS foto_url TEXT`);
 
   const { rows } = await pool.query('SELECT COUNT(*) AS c FROM items');
   if (parseInt(rows[0].c) === 0) {
@@ -186,6 +201,42 @@ app.delete('/api/users/:id', requireMaster, async (req, res) => {
     res.json({ ok: true });
   } catch (e) {
     res.status(500).json({ error: 'Erro ao deletar usuário' });
+  }
+});
+
+// ─── UPLOAD FOTO ─────────────────────────────────────────────────────────────
+app.post('/api/items/:id/foto', requireAdmin, upload.single('foto'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'Nenhum arquivo enviado' });
+  try {
+    // Upload para Cloudinary via stream
+    const result = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'shelf-control', resource_type: 'image', transformation: [{ width: 800, crop: 'limit', quality: 'auto' }] },
+        (error, result) => error ? reject(error) : resolve(result)
+      );
+      streamifier.createReadStream(req.file.buffer).pipe(stream);
+    });
+
+    // Salva URL no banco
+    const { rows } = await pool.query(
+      'UPDATE items SET foto_url=$1 WHERE id=$2 RETURNING *',
+      [result.secure_url, req.params.id]
+    );
+    if (!rows.length) return res.status(404).json({ error: 'Item não encontrado' });
+    res.json(rows[0]);
+  } catch (e) {
+    console.error('Cloudinary error:', e);
+    res.status(500).json({ error: 'Erro ao fazer upload da foto' });
+  }
+});
+
+app.delete('/api/items/:id/foto', requireAdmin, async (req, res) => {
+  try {
+    const { rows } = await pool.query('UPDATE items SET foto_url=NULL WHERE id=$1 RETURNING *', [req.params.id]);
+    if (!rows.length) return res.status(404).json({ error: 'Item não encontrado' });
+    res.json(rows[0]);
+  } catch (e) {
+    res.status(500).json({ error: 'Erro ao remover foto' });
   }
 });
 
