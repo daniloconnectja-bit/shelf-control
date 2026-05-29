@@ -18,10 +18,9 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'shelf-secret-key-2024',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 8 * 60 * 60 * 1000 } // 8 horas
+  cookie: { maxAge: 8 * 60 * 60 * 1000 }
 }));
 
-// Serve static files from 'public' folder or root (fallback)
 const staticDir = fs.existsSync(path.join(__dirname, 'public'))
   ? path.join(__dirname, 'public')
   : __dirname;
@@ -72,6 +71,17 @@ async function initDB() {
       created_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+
+  // Tabela de usuários (criados pelo admin master)
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS users (
+      id         SERIAL PRIMARY KEY,
+      username   VARCHAR(60) NOT NULL UNIQUE,
+      password   VARCHAR(120) NOT NULL,
+      created_at TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+
   const { rows } = await pool.query('SELECT COUNT(*) AS c FROM items');
   if (parseInt(rows[0].c) === 0) {
     for (const s of seedData) {
@@ -84,21 +94,48 @@ async function initDB() {
   }
 }
 
-// ─── AUTH MIDDLEWARE ──────────────────────────────────────────────────────────
+// ─── MIDDLEWARES ──────────────────────────────────────────────────────────────
 function requireAdmin(req, res, next) {
   if (req.session && req.session.isAdmin) return next();
   res.status(401).json({ error: 'Não autorizado' });
 }
 
+function requireMaster(req, res, next) {
+  if (req.session && req.session.isMaster) return next();
+  res.status(403).json({ error: 'Apenas o admin master pode gerenciar usuários' });
+}
+
 // ─── AUTH ROUTES ──────────────────────────────────────────────────────────────
-app.post('/api/login', (req, res) => {
-  const { password } = req.body;
-  if (password === ADMIN_PASSWORD) {
+app.post('/api/login', async (req, res) => {
+  const { password, username } = req.body;
+
+  // Login do admin master (sem username)
+  if (!username && password === ADMIN_PASSWORD) {
     req.session.isAdmin = true;
-    res.json({ ok: true });
-  } else {
-    res.status(401).json({ error: 'Senha incorreta' });
+    req.session.isMaster = true;
+    req.session.username = 'Admin Master';
+    return res.json({ ok: true, isMaster: true });
   }
+
+  // Login de usuário criado pelo admin
+  if (username) {
+    try {
+      const { rows } = await pool.query(
+        'SELECT * FROM users WHERE LOWER(username)=LOWER($1)',
+        [username]
+      );
+      if (rows.length && rows[0].password === password) {
+        req.session.isAdmin = true;
+        req.session.isMaster = false;
+        req.session.username = rows[0].username;
+        return res.json({ ok: true, isMaster: false });
+      }
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  res.status(401).json({ error: 'Usuário ou senha incorretos' });
 });
 
 app.post('/api/logout', (req, res) => {
@@ -107,7 +144,49 @@ app.post('/api/logout', (req, res) => {
 });
 
 app.get('/api/me', (req, res) => {
-  res.json({ isAdmin: !!(req.session && req.session.isAdmin) });
+  res.json({
+    isAdmin:  !!(req.session && req.session.isAdmin),
+    isMaster: !!(req.session && req.session.isMaster),
+    username: req.session?.username || null
+  });
+});
+
+// ─── USER MANAGEMENT ROUTES (master only) ────────────────────────────────────
+app.get('/api/users', requireMaster, async (req, res) => {
+  try {
+    const { rows } = await pool.query('SELECT id, username, created_at FROM users ORDER BY created_at DESC');
+    res.json(rows);
+  } catch (e) {
+    res.status(500).json({ error: 'Erro ao buscar usuários' });
+  }
+});
+
+app.post('/api/users', requireMaster, async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password)
+    return res.status(400).json({ error: 'Usuário e senha são obrigatórios' });
+  if (username.toLowerCase() === 'admin')
+    return res.status(400).json({ error: 'Nome "admin" reservado' });
+  try {
+    const { rows } = await pool.query(
+      'INSERT INTO users (username, password) VALUES ($1,$2) RETURNING id, username, created_at',
+      [username.trim(), password]
+    );
+    res.status(201).json(rows[0]);
+  } catch (e) {
+    if (e.code === '23505') return res.status(400).json({ error: 'Usuário já existe' });
+    res.status(500).json({ error: 'Erro ao criar usuário' });
+  }
+});
+
+app.delete('/api/users/:id', requireMaster, async (req, res) => {
+  try {
+    const { rowCount } = await pool.query('DELETE FROM users WHERE id=$1', [req.params.id]);
+    if (!rowCount) return res.status(404).json({ error: 'Usuário não encontrado' });
+    res.json({ ok: true });
+  } catch (e) {
+    res.status(500).json({ error: 'Erro ao deletar usuário' });
+  }
 });
 
 // ─── ITEM ROUTES ──────────────────────────────────────────────────────────────
@@ -164,12 +243,10 @@ app.delete('/api/items/:id', requireAdmin, async (req, res) => {
   }
 });
 
-// SPA fallback
 app.get('*', (req, res) => {
   res.sendFile(path.join(staticDir, 'index.html'));
 });
 
-// ─── START ────────────────────────────────────────────────────────────────────
 initDB().then(() => {
   app.listen(port, () => console.log(`Shelf Control rodando na porta ${port}`));
 }).catch(err => {

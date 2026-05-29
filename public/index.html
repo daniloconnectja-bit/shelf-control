@@ -229,10 +229,13 @@ mark{background:transparent;color:#ffffff;border-radius:2px;padding:0 2px;font-w
         <p>Rua A · Rua B · 18 posições</p>
       </div>
     </div>
-    <div id="auth-block">
-      <span id="auth-status" style="font-size:12px;color:var(--text2);margin-right:8px"></span>
+    <div id="auth-block" style="display:flex;align-items:center;gap:8px">
+      <span id="auth-status" style="font-size:12px;color:var(--text2)"></span>
+      <button id="btn-usuarios" onclick="openUsersModal()" style="display:none;padding:6px 14px;border:1px solid rgba(255,255,255,0.2);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(255,255,255,0.08);color:#fff;align-items:center;gap:5px">
+        <i class="ti ti-users"></i> Usuários
+      </button>
       <button id="btn-login" onclick="openLoginModal()" style="padding:6px 14px;border:1px solid rgba(249,180,45,0.4);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(249,180,45,0.1);color:var(--brand);display:flex;align-items:center;gap:5px;font-weight:500">
-        <i class="ti ti-lock"></i> Admin
+        <i class="ti ti-lock"></i> Entrar
       </button>
       <button id="btn-logout" onclick="doLogout()" style="display:none;padding:6px 14px;border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);align-items:center;gap:5px">
         <i class="ti ti-logout"></i> Sair
@@ -300,14 +303,37 @@ mark{background:transparent;color:#ffffff;border-radius:2px;padding:0 2px;font-w
 <!-- LOGIN MODAL -->
 <div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;align-items:center;justify-content:center">
   <div class="modal" style="width:320px">
-    <h3><i class="ti ti-lock" style="margin-right:6px"></i>Acesso Admin</h3>
-    <p class="modal-sub">Digite a senha para habilitar edição</p>
+    <h3><i class="ti ti-lock" style="margin-right:6px"></i>Entrar</h3>
+    <p class="modal-sub">Admin master: deixe usuário em branco. Outros usuários: preencha os dois campos.</p>
+    <label for="login-user">Usuário <span style="font-size:10px;color:rgba(255,255,255,0.4)">(deixe em branco para admin master)</span></label>
+    <input id="login-user" type="text" placeholder="Nome do usuário..." autocomplete="off" onkeydown="if(event.key==='Enter')doLogin()">
     <label for="login-pass">Senha</label>
-    <input id="login-pass" type="password" placeholder="Senha do admin" onkeydown="if(event.key==='Enter')doLogin()">
-    <p class="err-msg" id="err-login" style="display:none">Senha incorreta</p>
+    <input id="login-pass" type="password" placeholder="Senha..." onkeydown="if(event.key==='Enter')doLogin()">
+    <p class="err-msg" id="err-login" style="display:none">Usuário ou senha incorretos</p>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeLoginModal()">Cancelar</button>
       <button class="btn-save" id="btn-login-save" onclick="doLogin()">Entrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- USERS MODAL -->
+<div id="users-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;align-items:center;justify-content:center">
+  <div class="modal" style="width:380px;max-height:80vh;overflow-y:auto">
+    <h3><i class="ti ti-users" style="margin-right:6px"></i>Gerenciar Usuários</h3>
+    <p class="modal-sub">Usuários criados podem editar o estoque mas não gerenciam outros usuários.</p>
+    <div id="users-list" style="margin:14px 0"></div>
+    <div style="border-top:1px solid rgba(255,255,255,0.1);padding-top:14px;margin-top:4px">
+      <p style="font-size:12px;font-weight:600;color:#fff;margin-bottom:10px">Novo Usuário</p>
+      <label for="new-user-name">Nome do usuário</label>
+      <input id="new-user-name" type="text" placeholder="ex: joao.silva" autocomplete="off" maxlength="60">
+      <label for="new-user-pass">Senha</label>
+      <input id="new-user-pass" type="password" placeholder="Senha..." maxlength="120">
+      <p class="err-msg" id="err-new-user" style="display:none;margin-top:6px">Preencha todos os campos</p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeUsersModal()">Fechar</button>
+      <button class="btn-save" onclick="createUser()"><i class="ti ti-plus"></i> Criar</button>
     </div>
   </div>
 </div>
@@ -359,6 +385,8 @@ mark{background:transparent;color:#ffffff;border-radius:2px;padding:0 2px;font-w
 <script>
 // ─── STATE ────────────────────────────────────────────────────────────────────
 let isAdmin = false;
+let isMaster = false;
+let currentUsername = '';
 let items = [];
 const RUA_LEVELS = { A:[3,2,1], AF:[1], B:[3,2,1] };
 let currentTab = 'A', searchTerm = '', searchResults = [], currentResultIdx = 0;
@@ -385,27 +413,31 @@ function toast(msg, isErr=false){
 
 // ─── AUTH UI ──────────────────────────────────────────────────────────────────
 function updateAuthUI() {
-  const btnLogin  = document.getElementById('btn-login');
-  const btnLogout = document.getElementById('btn-logout');
-  const status    = document.getElementById('auth-status');
+  const btnLogin    = document.getElementById('btn-login');
+  const btnLogout   = document.getElementById('btn-logout');
+  const btnUsuarios = document.getElementById('btn-usuarios');
+  const status      = document.getElementById('auth-status');
   if (isAdmin) {
-    btnLogin.style.display  = 'none';
-    btnLogout.style.display = 'flex';
-    status.textContent = '🔓 Admin';
-    status.style.color = 'var(--rua-af)';
+    btnLogin.style.display    = 'none';
+    btnLogout.style.display   = 'flex';
+    btnUsuarios.style.display = isMaster ? 'flex' : 'none';
+    status.textContent = isMaster ? `🔑 ${currentUsername}` : `🔓 ${currentUsername}`;
+    status.style.color = isMaster ? 'var(--brand)' : 'var(--rua-af)';
   } else {
-    btnLogin.style.display  = 'flex';
-    btnLogout.style.display = 'none';
+    btnLogin.style.display    = 'flex';
+    btnLogout.style.display   = 'none';
+    btnUsuarios.style.display = 'none';
     status.textContent = '👁 Somente leitura';
     status.style.color = 'var(--text2)';
   }
 }
 
 function openLoginModal() {
+  document.getElementById('login-user').value = '';
   document.getElementById('login-pass').value = '';
   document.getElementById('err-login').style.display = 'none';
   document.getElementById('login-overlay').style.display = 'flex';
-  setTimeout(() => document.getElementById('login-pass').focus(), 100);
+  setTimeout(() => document.getElementById('login-user').focus(), 100);
 }
 
 function closeLoginModal() {
@@ -414,15 +446,19 @@ function closeLoginModal() {
 
 async function doLogin() {
   const password = document.getElementById('login-pass').value;
+  const username = document.getElementById('login-user').value.trim();
   const btn = document.getElementById('btn-login-save');
   btn.disabled = true; btn.textContent = 'Entrando...';
   try {
-    await api('POST', '/api/login', { password });
+    const res = await api('POST', '/api/login', { password, username: username || undefined });
     isAdmin = true;
+    isMaster = res.isMaster;
+    const me = await api('GET', '/api/me');
+    currentUsername = me.username || 'Admin';
     closeLoginModal();
     updateAuthUI();
     render();
-    toast('Modo admin ativado');
+    toast(isMaster ? `Bem-vindo, ${currentUsername}!` : `Bem-vindo, ${currentUsername}!`);
   } catch(e) {
     document.getElementById('err-login').style.display = 'block';
   } finally {
@@ -432,7 +468,7 @@ async function doLogin() {
 
 async function doLogout() {
   await api('POST', '/api/logout', {});
-  isAdmin = false;
+  isAdmin = false; isMaster = false; currentUsername = '';
   updateAuthUI();
   render();
   toast('Sessão encerrada');
@@ -808,10 +844,88 @@ document.getElementById('smodal-input').addEventListener('keydown',e=>{
   if(e.key==='Escape') closeSearchModal();
 });
 
+
+// ─── USERS MODAL ──────────────────────────────────────────────────────────────
+function openUsersModal() {
+  document.getElementById('new-user-name').value = '';
+  document.getElementById('new-user-pass').value = '';
+  document.getElementById('err-new-user').classList.remove('show');
+  document.getElementById('users-overlay').style.display = 'flex';
+  loadUsers();
+}
+
+function closeUsersModal() {
+  document.getElementById('users-overlay').style.display = 'none';
+}
+
+async function loadUsers() {
+  const container = document.getElementById('users-list');
+  container.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.4);padding:8px 0">Carregando...</div>';
+  try {
+    const users = await api('GET', '/api/users');
+    if (!users.length) {
+      container.innerHTML = '<div style="font-size:12px;color:rgba(255,255,255,0.4);padding:8px 0">Nenhum usuário cadastrado ainda.</div>';
+      return;
+    }
+    container.innerHTML = users.map(u => {
+      const date = new Date(u.created_at).toLocaleDateString('pt-BR');
+      return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 10px;background:rgba(255,255,255,0.06);border-radius:6px;margin-bottom:6px;border:1px solid rgba(255,255,255,0.1)">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#fff"><i class="ti ti-user" style="font-size:12px;margin-right:4px;color:var(--rua-af)"></i>${u.username}</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-top:2px">Criado em ${date}</div>
+        </div>
+        <button onclick="deleteUser(${u.id}, '${u.username}')" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);color:#ef4444;padding:5px 10px;border-radius:5px;font-size:11px;cursor:pointer;display:flex;align-items:center;gap:4px">
+          <i class="ti ti-trash"></i> Remover
+        </button>
+      </div>`;
+    }).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="font-size:12px;color:#ef4444;padding:8px 0">Erro ao carregar usuários.</div>';
+  }
+}
+
+async function createUser() {
+  const username = document.getElementById('new-user-name').value.trim();
+  const password = document.getElementById('new-user-pass').value.trim();
+  const errEl = document.getElementById('err-new-user');
+  if (!username || !password) {
+    errEl.textContent = 'Preencha nome e senha';
+    errEl.classList.add('show'); return;
+  }
+  try {
+    await api('POST', '/api/users', { username, password });
+    document.getElementById('new-user-name').value = '';
+    document.getElementById('new-user-pass').value = '';
+    errEl.classList.remove('show');
+    toast('Usuário criado com sucesso!');
+    loadUsers();
+  } catch(e) {
+    errEl.textContent = e.message || 'Erro ao criar usuário';
+    errEl.classList.add('show');
+  }
+}
+
+async function deleteUser(id, username) {
+  if (!confirm(`Remover usuário "${username}"?`)) return;
+  try {
+    await api('DELETE', `/api/users/${id}`);
+    toast('Usuário removido');
+    loadUsers();
+  } catch(e) {
+    toast('Erro ao remover usuário', true);
+  }
+}
+
+document.getElementById('users-overlay').addEventListener('click', e => {
+  if (e.target === e.currentTarget) closeUsersModal();
+});
+
 // ─── INIT ─────────────────────────────────────────────────────────────────────
 (async ()=>{
-  const me = await api('GET', '/api/me').catch(()=>({isAdmin:false}));
+  const me = await api('GET', '/api/me').catch(()=>({isAdmin:false,isMaster:false,username:''}));
   isAdmin = me.isAdmin;
+  isMaster = me.isMaster;
+  currentUsername = me.username || '';
   updateAuthUI();
   await loadItems();
   setTab('A');
