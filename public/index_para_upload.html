@@ -555,7 +555,6 @@ function renderGrid(rua){
           <div class="level-items open" id="lvl-${rua}-${pos}-${nivel}">
             ${hasItems?lvItems.map(it=>`
               <div class="shelf-item${hlIds.has(it.id)?' highlighted':''}" id="item-${it.id}">
-                ${it.foto_url?`<img class="item-thumb" src="${it.foto_url}" alt="${it.nome}" onclick="openPhoto('${it.foto_url}','${it.nome.replace(/'/g,"\\'")}',event)">`:''}
                 <div style="flex:1;min-width:0">
                   <div class="item-name">${hl(it.nome,searchTerm)}</div>
                   ${it.descricao?`<div class="item-desc">${hl(it.descricao,searchTerm)}</div>`:''}
