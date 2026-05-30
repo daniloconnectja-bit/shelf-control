@@ -10,7 +10,7 @@
 :root{
   --brand:#ffffff;--brand-dark:#cccccc;--brand-dim:rgba(255,255,255,0.15);
   --rua-a:#3b82f6;--rua-b:#a78bfa;--rua-af:#34d399;
-  --nivel-topo:#ff2020;--nivel-meio:#ffc800;--nivel-base:#22cc44;
+  --nivel-topo:#ffffff;--nivel-meio:#ffc800;--nivel-base:#22cc44;
   --hl:#ffffff;--hl-bg:rgba(255,255,255,0.12);
   --surface:#1565C0;--surface2:#1055A8;--border:rgba(255,255,255,0.1);
   --text:#ffffff;--text2:rgba(255,255,255,0.85);
@@ -57,7 +57,7 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--bg);min
 .rua-badge.B{background:var(--rua-b);color:#fff}
 .rua-badge.AF{background:var(--rua-af);color:#fff}
 .rua-header-text h2{font-size:18px;font-weight:800;color:var(--brand);font-family:Georgia,serif;letter-spacing:-0.3px;text-shadow:0 1px 3px rgba(0,0,0,0.3)}
-.rua-header-text p{font-size:13px;color:rgba(255,255,255,0.75);font-weight:600}
+.rua-header-text p{font-size:12px;color:rgba(255,255,255,0.9);font-weight:500}
 .positions-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(148px,1fr));gap:10px}
 .shelf-pos{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:box-shadow 0.15s}
 .shelf-pos:hover{box-shadow:0 2px 8px rgba(0,0,0,0.2)}
@@ -72,7 +72,7 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--bg);min
 .level-header{display:flex;align-items:center;padding:5px 8px;cursor:pointer;transition:background 0.1s}
 .level-header:hover{background:var(--surface2)}
 .level-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;margin-right:6px}
-.level-label{font-size:11px;font-weight:500;flex:1}
+.level-label{font-size:13px;font-weight:700;flex:1}
 .level-count{font-size:10px;color:var(--text2);margin-right:6px}
 .level-add{background:none;border:none;cursor:pointer;width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px}
 .level-add:hover{background:var(--surface2);color:var(--text)}
@@ -874,5 +874,33 @@ document.getElementById('smodal-input').addEventListener('keydown',e=>{
   setTab('A');
 })();
 </script>
+
+<script>
+(function(){
+  function applyLevelColors(){
+    document.querySelectorAll('.level-header').forEach(function(h){
+      var dot = h.querySelector('.level-dot');
+      var label = h.querySelector('.level-label');
+      if(dot && label && !label._c){
+        var bg = dot.style.background || dot.style.backgroundColor;
+        if(bg){
+          var match = bg.match(/var\(([^)]+)\)/);
+          if(match){
+            var val = getComputedStyle(document.documentElement).getPropertyValue(match[1].trim());
+            if(val) { label.style.color = val.trim(); label._c = true; }
+          } else {
+            label.style.color = bg; label._c = true;
+          }
+        }
+      }
+    });
+  }
+  var obs = new MutationObserver(applyLevelColors);
+  obs.observe(document.body, {childList:true, subtree:true});
+  applyLevelColors();
+  setTimeout(applyLevelColors, 500);
+  setTimeout(applyLevelColors, 1500);
+})();
+<\/script>
 </body>
 </html>
