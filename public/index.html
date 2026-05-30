@@ -213,12 +213,12 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
   <div id="header-top">
     <div>
       <h1 style="font-size:14px;font-weight:500;color:rgba(255,255,255,0.9)">Controle de Prateleiras</h1>
-      <p style="font-size:11px;color:var(--text2)">Rua A ÃÂ· Rua B ÃÂ· 18 posiÃÂ§ÃÂµes</p>
+      <p style="font-size:11px;color:var(--text2)">Rua A · Rua B · 18 posições</p>
     </div>
     <div id="auth-block">
       <span id="auth-status" style="font-size:12px;color:var(--text2);margin-right:4px"></span>
       <button id="btn-usuarios" onclick="openUsersModal()" style="display:none;padding:6px 12px;border:1px solid rgba(255,255,255,0.2);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(255,255,255,0.08);color:#fff;align-items:center;gap:5px">
-        <i class="ti ti-users"></i> UsuÃÂ¡rios
+        <i class="ti ti-users"></i> Usuários
       </button>
       <button id="btn-login" onclick="openLoginModal()" style="padding:6px 14px;border:1px solid rgba(249,180,45,0.4);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(249,180,45,0.1);color:var(--brand);display:flex;align-items:center;gap:5px;font-weight:500">
         <i class="ti ti-lock"></i> Entrar
@@ -238,14 +238,14 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
       <span class="nav-count" id="nav-count">0 de 0</span>
       <button onclick="navResult(-1)"><i class="ti ti-chevron-up"></i></button>
       <button onclick="navResult(1)"><i class="ti ti-chevron-down"></i></button>
-      <button class="btn-ver" onclick="openSearchModal()">Localizar Ã¢ÂÂ</button>
+      <button class="btn-ver" onclick="openSearchModal()">Localizar ↗</button>
     </div>
   </div>
 </div>
 
 <div id="tab-strip">
-  <button class="main-tab active" data-tab="A" onclick="setTab('A')"><span class="tab-dot" style="background:var(--rua-a)"></span>Rua A Ã¢ÂÂ Frente</button>
-  <button class="main-tab tab-af" data-tab="AF" onclick="setTab('AF')"><span class="tab-dot" style="background:var(--rua-af)"></span>Rua A Ã¢ÂÂ Posterior</button>
+  <button class="main-tab active" data-tab="A" onclick="setTab('A')"><span class="tab-dot" style="background:var(--rua-a)"></span>Rua A — Frente</button>
+  <button class="main-tab tab-af" data-tab="AF" onclick="setTab('AF')"><span class="tab-dot" style="background:var(--rua-af)"></span>Rua A — Posterior</button>
   <button class="main-tab tab-b" data-tab="B" onclick="setTab('B')"><span class="tab-dot" style="background:var(--rua-b)"></span>Rua B</button>
   <button class="main-tab" data-tab="todos" onclick="setTab('todos')"><i class="ti ti-layout-grid" style="font-size:14px"></i>Todas</button>
 </div>
@@ -256,21 +256,21 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
   <div id="sec-A" class="rua-section">
     <div class="rua-header">
       <div class="rua-badge A">A</div>
-      <div class="rua-header-text"><h2>Rua A Ã¢ÂÂ Frente</h2><p>18 posiÃÂ§ÃÂµes ÃÂ· Topo, Meio e Base</p></div>
+      <div class="rua-header-text"><h2>Rua A — Frente</h2><p>18 posições · Topo, Meio e Base</p></div>
     </div>
     <div class="positions-grid" id="grid-A"></div>
   </div>
   <div id="sec-AF" class="rua-section">
     <div class="rua-header">
       <div class="rua-badge AF">A<br><span style="font-size:9px;font-weight:400">Post</span></div>
-      <div class="rua-header-text"><h2>Rua A Ã¢ÂÂ Posterior</h2><p>18 posiÃÂ§ÃÂµes ÃÂ· Somente Base</p></div>
+      <div class="rua-header-text"><h2>Rua A — Posterior</h2><p>18 posições · Somente Base</p></div>
     </div>
     <div class="positions-grid" id="grid-AF"></div>
   </div>
   <div id="sec-B" class="rua-section">
     <div class="rua-header">
       <div class="rua-badge B">B</div>
-      <div class="rua-header-text"><h2>Rua B</h2><p>18 posiÃÂ§ÃÂµes ÃÂ· Topo, Meio e Base</p></div>
+      <div class="rua-header-text"><h2>Rua B</h2><p>18 posições · Topo, Meio e Base</p></div>
     </div>
     <div class="positions-grid" id="grid-B"></div>
   </div>
@@ -281,12 +281,12 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
 <div id="login-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;align-items:center;justify-content:center">
   <div class="modal" style="width:320px">
     <h3><i class="ti ti-lock" style="margin-right:6px"></i>Acesso Admin</h3>
-    <p class="modal-sub">Deixe o usuÃÂ¡rio em branco para entrar como Admin Master</p>
-    <label>UsuÃÂ¡rio (opcional)</label>
-    <input id="login-user" type="text" placeholder="UsuÃÂ¡rio (vazio = Admin Master)" autocomplete="off">
+    <p class="modal-sub">Deixe o usuário em branco para entrar como Admin Master</p>
+    <label>Usuário (opcional)</label>
+    <input id="login-user" type="text" placeholder="Usuário (vazio = Admin Master)" autocomplete="off">
     <label>Senha</label>
     <input id="login-pass" type="password" placeholder="Senha" onkeydown="if(event.key==='Enter')doLogin()">
-    <p class="err-msg" id="err-login" style="display:none">UsuÃÂ¡rio ou senha incorretos</p>
+    <p class="err-msg" id="err-login" style="display:none">Usuário ou senha incorretos</p>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeLoginModal()">Cancelar</button>
       <button class="btn-save" id="btn-login-save" onclick="doLogin()">Entrar</button>
@@ -301,15 +301,15 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
     <p class="modal-sub" id="modal-sub"></p>
     <label for="modal-nome">Nome *</label>
     <input id="modal-nome" type="text" placeholder="Nome do item" maxlength="120" oninput="clearFieldErr('nome')">
-    <p class="err-msg" id="err-nome">Nome ÃÂ© obrigatÃÂ³rio</p>
-    <label for="modal-desc">DescriÃÂ§ÃÂ£o</label>
-    <textarea id="modal-desc" rows="3" placeholder="DescriÃÂ§ÃÂ£o (opcional)" maxlength="400"></textarea>
+    <p class="err-msg" id="err-nome">Nome é obrigatório</p>
+    <label for="modal-desc">Descrição</label>
+    <textarea id="modal-desc" rows="3" placeholder="Descrição (opcional)" maxlength="400"></textarea>
     <div id="foto-section" style="display:none;margin-top:12px">
       <label>Foto do Item</label>
       <img id="foto-preview-img" class="foto-preview-img" src="" alt="preview">
       <div class="upload-area" onclick="document.getElementById('foto-file-input').click()">
         <i class="ti ti-camera" style="font-size:22px;color:rgba(255,255,255,0.4)"></i>
-        <p>Clique para enviar uma foto (mÃÂ¡x 5MB)</p>
+        <p>Clique para enviar uma foto (máx 5MB)</p>
         <input type="file" id="foto-file-input" accept="image/*" onchange="onFotoSelected(this)">
       </div>
       <button id="btn-remove-foto" onclick="removeFoto()" style="display:none;margin-top:8px;background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);color:#ef4444;padding:5px 12px;border-radius:6px;font-size:12px;cursor:pointer;width:100%">
@@ -326,17 +326,17 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
 <!-- USERS MODAL -->
 <div id="users-overlay">
   <div class="modal" style="width:400px;max-height:80vh;overflow-y:auto">
-    <h3><i class="ti ti-users" style="margin-right:6px"></i>Gerenciar UsuÃÂ¡rios</h3>
-    <p class="modal-sub">Crie usuÃÂ¡rios que podem editar o estoque</p>
+    <h3><i class="ti ti-users" style="margin-right:6px"></i>Gerenciar Usuários</h3>
+    <p class="modal-sub">Crie usuários que podem editar o estoque</p>
     <div id="users-list" style="margin:12px 0;max-height:200px;overflow-y:auto"></div>
-    <label>Novo usuÃÂ¡rio</label>
-    <input id="new-username" type="text" placeholder="Nome do usuÃÂ¡rio" style="margin-bottom:8px">
+    <label>Novo usuário</label>
+    <input id="new-username" type="text" placeholder="Nome do usuário" style="margin-bottom:8px">
     <label>Senha</label>
     <input id="new-password" type="password" placeholder="Senha">
     <p class="err-msg" id="err-user"></p>
     <div class="modal-footer">
       <button class="btn-cancel" onclick="closeUsersModal()">Fechar</button>
-      <button class="btn-save" onclick="createUser()">Criar usuÃÂ¡rio</button>
+      <button class="btn-save" onclick="createUser()">Criar usuário</button>
     </div>
   </div>
 </div>
@@ -361,7 +361,7 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
       <span class="smodal-footer-info" id="smodal-footer-info">Nenhum resultado</span>
       <div class="smodal-footer-btns">
         <button class="sfbtn" onclick="smodalNav(-1)"><i class="ti ti-chevron-up"></i> Anterior</button>
-        <button class="sfbtn" onclick="smodalNav(1)">PrÃÂ³ximo <i class="ti ti-chevron-down"></i></button>
+        <button class="sfbtn" onclick="smodalNav(1)">Próximo <i class="ti ti-chevron-down"></i></button>
         <button class="sfbtn go" onclick="goToResult()"><i class="ti ti-map-pin"></i> Ir para a prateleira</button>
       </div>
     </div>
@@ -401,13 +401,13 @@ function updateAuthUI(){
     btnLogin.style.display='none';
     btnLogout.style.display='flex';
     btnUsuarios.style.display=isMaster?'flex':'none';
-    status.textContent=(isMaster?'Ã°ÂÂÂ Master':'Ã°ÂÂÂ '+(currentUsername||'Admin'));
+    status.textContent=(isMaster?'👑 Master':'🔓 '+(currentUsername||'Admin'));
     status.style.color=isMaster?'var(--brand)':'var(--rua-af)';
   } else {
     btnLogin.style.display='flex';
     btnLogout.style.display='none';
     btnUsuarios.style.display='none';
-    status.textContent='Ã°ÂÂÂ Somente leitura';
+    status.textContent='👁 Somente leitura';
     status.style.color='var(--text2)';
   }
 }
@@ -435,7 +435,7 @@ async function doLogin(){
 async function doLogout(){
   await api('POST','/api/logout',{});
   isAdmin=false; isMaster=false; currentUsername=null;
-  updateAuthUI(); render(); toast('SessÃÂ£o encerrada');
+  updateAuthUI(); render(); toast('Sessão encerrada');
 }
 
 // USERS
@@ -448,12 +448,12 @@ async function loadUsers(){
   try{
     const users=await api('GET','/api/users');
     const el=document.getElementById('users-list');
-    if(!users.length){el.innerHTML='<p style="font-size:12px;color:rgba(255,255,255,0.5)">Nenhum usuÃÂ¡rio criado</p>';return;}
+    if(!users.length){el.innerHTML='<p style="font-size:12px;color:rgba(255,255,255,0.5)">Nenhum usuário criado</p>';return;}
     el.innerHTML=users.map(u=>`<div class="user-row">
       <span>${escHtml(u.username)}</span>
       <button onclick="deleteUser(${u.id})" style="background:rgba(220,38,38,0.15);border:1px solid rgba(220,38,38,0.3);color:#ef4444;padding:3px 10px;border-radius:6px;font-size:11px;cursor:pointer">Remover</button>
     </div>`).join('');
-  }catch(e){toast('Erro ao carregar usuÃÂ¡rios',true);}
+  }catch(e){toast('Erro ao carregar usuários',true);}
 }
 async function createUser(){
   const username=document.getElementById('new-username').value.trim();
@@ -465,12 +465,12 @@ async function createUser(){
     await api('POST','/api/users',{username,password});
     document.getElementById('new-username').value='';
     document.getElementById('new-password').value='';
-    toast('UsuÃÂ¡rio criado'); await loadUsers();
+    toast('Usuário criado'); await loadUsers();
   }catch(e){errEl.textContent=e.message;errEl.style.display='block';}
 }
 async function deleteUser(id){
-  if(!confirm('Remover usuÃÂ¡rio?')) return;
-  try{await api('DELETE',`/api/users/${id}`);toast('UsuÃÂ¡rio removido');await loadUsers();}
+  if(!confirm('Remover usuário?')) return;
+  try{await api('DELETE',`/api/users/${id}`);toast('Usuário removido');await loadUsers();}
   catch(e){toast('Erro ao remover',true);}
 }
 
@@ -543,7 +543,7 @@ function renderGrid(rua){
     return`<div class="shelf-pos" id="pos-${rua}-${pos}">
       <div class="shelf-pos-header ${hc}">
         <div class="shelf-pos-label">${dl}</div>
-        <div class="shelf-pos-sub">${levels.length} nÃÂ­vel${levels.length>1?'is':''}</div>
+        <div class="shelf-pos-sub">${levels.length} nível${levels.length>1?'is':''}</div>
       </div>
       ${levels.map(nivel=>{
         const lvItems=items.filter(i=>i.rua===rua&&i.posicao===pos&&i.nivel===nivel);
@@ -646,7 +646,7 @@ function openCreate(rua,posicao,nivel){
   modalMode='create'; modalCtx={rua,posicao,nivel}; fotoFileSelected=null;
   const pl=rua==='AF'?`A-${posicao} Posterior`:`${rua}-${posicao}`;
   document.getElementById('modal-title').textContent='Adicionar Item';
-  document.getElementById('modal-sub').textContent=`${pl} ÃÂ· ${getLevelLabel(nivel)}`;
+  document.getElementById('modal-sub').textContent=`${pl} · ${getLevelLabel(nivel)}`;
   document.getElementById('modal-nome').value='';
   document.getElementById('modal-desc').value='';
   document.getElementById('err-nome').classList.remove('show');
@@ -661,7 +661,7 @@ function openEdit(id){
   modalMode='edit'; modalCtx={id,foto_url:item.foto_url||null}; fotoFileSelected=null;
   const pl=item.rua==='AF'?`A-${item.posicao} Posterior`:`${item.rua}-${item.posicao}`;
   document.getElementById('modal-title').textContent='Editar Item';
-  document.getElementById('modal-sub').textContent=`${pl} ÃÂ· ${getLevelLabel(item.nivel)}`;
+  document.getElementById('modal-sub').textContent=`${pl} · ${getLevelLabel(item.nivel)}`;
   document.getElementById('modal-nome').value=item.nome;
   document.getElementById('modal-desc').value=item.descricao||'';
   document.getElementById('err-nome').classList.remove('show');
@@ -756,11 +756,11 @@ function renderSmodalList(res){
   const term=document.getElementById('smodal-input').value;
   if(!res.length){el.innerHTML=`<div class="smodal-empty-msg">${term?'Nenhum resultado para <strong>'+escHtml(term)+'</strong>':'Digite para localizar itens'}</div>`;return;}
   el.innerHTML=res.map((it,i)=>{
-    const pl=it.rua==='AF'?`A-${it.posicao}Ã¢ÂÂ`:`${it.rua}-${it.posicao}`;
+    const pl=it.rua==='AF'?`A-${it.posicao}↑`:`${it.rua}-${it.posicao}`;
     const rc=it.rua==='AF'?'AF':it.rua;
     return`<div class="sresult${i===smodalIdx?' active':''}" onclick="smodalSelect(${i})" id="sr-${i}">
       <div class="sresult-badges">
-        <span class="badge-rua ${rc}">${it.rua==='AF'?'AÃ¢ÂÂ':it.rua}</span>
+        <span class="badge-rua ${rc}">${it.rua==='AF'?'A↑':it.rua}</span>
         <span class="badge-nivel ${getLevelClass(it.nivel)}">${getLevelLabel(it.nivel)}</span>
       </div>
       <div class="sresult-info">
@@ -778,19 +778,19 @@ function renderSmodalDetail(item,term){
   const rua=item.rua,posicao=item.posicao;
   const posLabel=rua==='AF'?`A-${posicao} (Posterior)`:`${rua}-${posicao}`;
   const rc=rua==='AF'?'AF':rua;
-  const ruaLabel=rua==='AF'?'Rua A Ã¢ÂÂ Posterior':rua==='A'?'Rua A Ã¢ÂÂ Frente':'Rua B';
+  const ruaLabel=rua==='AF'?'Rua A — Posterior':rua==='A'?'Rua A — Frente':'Rua B';
   const levels=RUA_LEVELS[rua];
   const posItems=items.filter(i=>i.rua===rua&&i.posicao===posicao);
   const shelfRows=levels.map(nivel=>{
     const lvItems=posItems.filter(i=>i.nivel===nivel);
     const isActive=nivel===item.nivel;
     const dotColors={3:'var(--nivel-topo)',2:'var(--nivel-meio)',1:'var(--nivel-base)'};
-    const names=lvItems.map(i=>i.nome).join(', ')||'Ã¢ÂÂ';
+    const names=lvItems.map(i=>i.nome).join(', ')||'—';
     return`<div class="sdetail-level-row${isActive?' active-level':''}">
       <span class="sdetail-level-dot" style="background:${dotColors[nivel]}"></span>
       <span class="sdetail-level-label">${getLevelLabel(nivel)}</span>
       <span class="sdetail-level-items">${isActive?`<strong>${escHtml(names)}</strong>`:escHtml(names)}</span>
-      ${isActive?`<span class="sdetail-level-badge" style="background:var(--hl-bg);color:var(--hl);border:1px solid var(--hl)">Ã¢ÂÂ aqui</span>`:''}
+      ${isActive?`<span class="sdetail-level-badge" style="background:var(--hl-bg);color:var(--hl);border:1px solid var(--hl)">← aqui</span>`:''}
     </div>`;
   }).join('');
   const nomeEscapado=item.nome.replace(/'/g,"\\'");
@@ -798,13 +798,13 @@ function renderSmodalDetail(item,term){
     <div class="sdetail-location">
       <span class="loc-chip rua-${rc}">${ruaLabel}</span>
       <span class="loc-sep"><i class="ti ti-chevron-right" style="font-size:12px"></i></span>
-      <span class="loc-chip rua-${rc}" style="opacity:0.8;font-weight:400">PosiÃÂ§ÃÂ£o ${posLabel}</span>
+      <span class="loc-chip rua-${rc}" style="opacity:0.8;font-weight:400">Posição ${posLabel}</span>
       <span class="loc-sep"><i class="ti ti-chevron-right" style="font-size:12px"></i></span>
       <span class="loc-chip nivel-${getLevelClass(item.nivel)}">${getLevelLabel(item.nivel)}</span>
     </div>
     <div class="sdetail-item-card">
       <div class="sdetail-item-name">${hl(item.nome,searchVal)}</div>
-      ${item.descricao?`<div class="sdetail-item-desc">${hl(item.descricao,searchVal)}</div>`:`<div class="sdetail-item-desc" style="font-style:italic">Sem descriÃÂ§ÃÂ£o</div>`}
+      ${item.descricao?`<div class="sdetail-item-desc">${hl(item.descricao,searchVal)}</div>`:`<div class="sdetail-item-desc" style="font-style:italic">Sem descrição</div>`}
       <div class="sdetail-item-meta">
         <span><i class="ti ti-map-pin" style="font-size:12px;margin-right:3px"></i>${posLabel}</span>
         <span><i class="ti ti-stack" style="font-size:12px;margin-right:3px"></i>${getLevelLabel(item.nivel)}</span>
