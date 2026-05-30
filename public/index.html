@@ -52,7 +52,7 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--bg);min
 .rua-section{display:none}
 .rua-section.visible{display:block}
 .rua-header{display:flex;align-items:center;gap:12px;margin-bottom:14px}
-.rua-badge{width:40px;height:40px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;flex-shrink:0;line-height:1.2;text-align:center}
+.rua-badge{width:60px;height:60px;border-radius:var(--radius-md);display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:800;flex-shrink:0;line-height:1.2;text-align:center}
 .rua-badge.A{background:var(--rua-a);color:#fff}
 .rua-badge.B{background:var(--rua-b);color:#fff}
 .rua-badge.AF{background:var(--rua-af);color:#fff}
@@ -874,7 +874,6 @@ document.getElementById('smodal-input').addEventListener('keydown',e=>{
   setTab('A');
 })();
 </script>
-
 <script>
 (function(){
   function applyLevelColors(){
@@ -887,10 +886,8 @@ document.getElementById('smodal-input').addEventListener('keydown',e=>{
           var match = bg.match(/var\(([^)]+)\)/);
           if(match){
             var val = getComputedStyle(document.documentElement).getPropertyValue(match[1].trim());
-            if(val) { label.style.color = val.trim(); label._c = true; }
-          } else {
-            label.style.color = bg; label._c = true;
-          }
+            if(val){ label.style.color = val.trim(); label._c = true; }
+          } else { label.style.color = bg; label._c = true; }
         }
       }
     });
