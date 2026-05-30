@@ -8,10 +8,10 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --brand:#e6a000;--brand-dark:#b87800;--brand-dim:rgba(249,180,45,0.15);
+  --brand:#ffffff;--brand-dark:#cccccc;--brand-dim:rgba(249,180,45,0.15);
   --rua-a:#3b82f6;--rua-b:#a78bfa;--rua-af:#34d399;
-  --nivel-topo:#e6a000;--nivel-meio:#2ecc71;--nivel-base:#a78bfa;
-  --hl:#e6a000;--hl-bg:rgba(249,180,45,0.12);
+  --nivel-topo:#ffffff;--nivel-meio:#2ecc71;--nivel-base:#a78bfa;
+  --hl:#ffffff;--hl-bg:rgba(249,180,45,0.12);
   --surface:#1565C0;--surface2:#1055A8;--border:rgba(255,255,255,0.1);
   --text:#ffffff;--text2:rgba(255,255,255,0.85);
   --bg:#87ceeb;
@@ -78,7 +78,7 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--bg);min
 .level-add:hover{background:var(--surface2);color:var(--text)}
 .level-chevron{font-size:12px;color:var(--text2);transition:transform 0.15s;margin-left:2px}
 .level-row[data-nivel="3"] .level-dot{background:var(--nivel-topo)}
-.level-row[data-nivel="3"] .level-label{color:#e6a000}
+.level-row[data-nivel="3"] .level-label{color:#ffffff}
 .level-row[data-nivel="2"] .level-dot{background:var(--nivel-meio)}
 .level-row[data-nivel="2"] .level-label{color:#2ecc71}
 .level-row[data-nivel="1"] .level-dot{background:var(--nivel-base)}
@@ -154,7 +154,7 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--bg);min
 .badge-nivel{font-size:10px;padding:1px 6px;border-radius:4px;text-align:center;font-weight:600}
 .badge-nivel.n1{background:rgba(167,139,250,0.25);color:#c4b5fd;border:1px solid rgba(167,139,250,0.4)}
 .badge-nivel.n2{background:rgba(46,204,113,0.2);color:#4ade80;border:1px solid rgba(46,204,113,0.4)}
-.badge-nivel.n3{background:rgba(249,180,45,0.2);color:#e6a000;border:1px solid rgba(249,180,45,0.4)}
+.badge-nivel.n3{background:rgba(249,180,45,0.2);color:#ffffff;border:1px solid rgba(249,180,45,0.4)}
 .sresult-info{flex:1;min-width:0}
 .sresult-name{font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .sresult-desc{font-size:11px;color:rgba(255,255,255,0.6);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;margin-top:2px}
@@ -165,7 +165,7 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--bg);min
 .sdetail-location{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .loc-chip{padding:4px 10px;border-radius:20px;font-size:12px;font-weight:600}
 .loc-chip.rua-A{background:var(--rua-a);color:#fff}.loc-chip.rua-B{background:var(--rua-b);color:#fff}.loc-chip.rua-AF{background:var(--rua-af);color:#fff}
-.loc-chip.nivel-n3{background:rgba(249,180,45,0.25);color:#e6a000;border:1px solid rgba(249,180,45,0.5)}
+.loc-chip.nivel-n3{background:rgba(249,180,45,0.25);color:#ffffff;border:1px solid rgba(249,180,45,0.5)}
 .loc-chip.nivel-n2{background:rgba(46,204,113,0.2);color:#4ade80;border:1px solid rgba(46,204,113,0.4)}
 .loc-chip.nivel-n1{background:rgba(167,139,250,0.25);color:#c4b5fd;border:1px solid rgba(167,139,250,0.4)}
 .loc-sep{color:rgba(255,255,255,0.5);font-size:12px}
@@ -810,7 +810,7 @@ function renderSmodalDetail(item,term){
         <span><i class="ti ti-stack" style="font-size:12px;margin-right:3px"></i>${getLevelLabel(item.nivel)}</span>
         <span><i class="ti ti-id" style="font-size:12px;margin-right:3px"></i>ID ${item.id}</span>
       </div>
-      ${item.foto_url?`<button onclick="openPhoto('${item.foto_url}','${nomeEscapado}')" style="margin-top:10px;width:100%;background:rgba(249,180,45,0.12);border:1px solid rgba(249,180,45,0.35);color:#e6a000;padding:7px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ti ti-photo" style="font-size:14px"></i> Ver foto</button>`:''}
+      ${item.foto_url?`<button onclick="openPhoto('${item.foto_url}','${nomeEscapado}')" style="margin-top:10px;width:100%;background:rgba(249,180,45,0.12);border:1px solid rgba(249,180,45,0.35);color:#ffffff;padding:7px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ti ti-photo" style="font-size:14px"></i> Ver foto</button>`:''}
     </div>
     <div class="sdetail-shelf-card">
       <div class="sdetail-shelf-title"><i class="ti ti-stack-2" style="font-size:12px;margin-right:4px"></i>Prateleira ${posLabel}</div>
