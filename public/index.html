@@ -46,7 +46,7 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--bg);min
 .main-tab.active{color:var(--brand);border-bottom-color:var(--brand)}
 .main-tab.active.tab-af{color:var(--rua-af);border-bottom-color:var(--rua-af)}
 .main-tab.active.tab-b{color:var(--rua-b);border-bottom-color:var(--rua-b)}
-.tab-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.tab-dot{width:12px;height:12px;border-radius:50%;flex-shrink:0}
 #results-banner{display:none;padding:9px 20px;background:rgba(249,180,45,0.1);border-bottom:1px solid rgba(249,180,45,0.25);font-size:13px;color:var(--brand)}
 #content{padding:20px;display:flex;flex-direction:column;gap:24px}
 .rua-section{display:none}
@@ -247,7 +247,7 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
   <button class="main-tab active" data-tab="A" onclick="setTab('A')"><span class="tab-dot" style="background:var(--rua-a)"></span>Rua A — Frente</button>
   <button class="main-tab tab-af" data-tab="AF" onclick="setTab('AF')"><span class="tab-dot" style="background:var(--rua-af)"></span>Rua A — Posterior</button>
   <button class="main-tab tab-b" data-tab="B" onclick="setTab('B')"><span class="tab-dot" style="background:var(--rua-b)"></span>Rua B</button>
-  <button class="main-tab" data-tab="todos" onclick="setTab('todos')"><i class="ti ti-layout-grid" style="font-size:14px"></i>Todas</button>
+  <button class="main-tab" data-tab="todos" onclick="setTab('todos')"><i class="ti ti-layout-grid" style="font-size:20px"></i>Todas</button>
 </div>
 
 <div id="results-banner"></div>
