@@ -469,7 +469,7 @@ async function createUser(){
   }catch(e){errEl.textContent=e.message;errEl.style.display='block';}
 }
 async function deleteUser(id){
-  if(!confirm('Remover usuário?')) return;
+  if(!await showConfirm('Remover usuário?')) return;
   try{await api('DELETE',`/api/users/${id}`);toast('Usuário removido');await loadUsers();}
   catch(e){toast('Erro ao remover',true);}
 }
@@ -719,7 +719,7 @@ function closeModal(){
   modalMode=null; modalCtx={}; fotoFileSelected=null;
 }
 async function deleteItem(id){
-  if(!confirm('Remover este item?')) return;
+  if(!await showConfirm('Remover este item?')) return;
   try{
     await api('DELETE',`/api/items/${id}`);
     items=items.filter(i=>i.id!==id);
@@ -874,5 +874,40 @@ document.getElementById('smodal-input').addEventListener('keydown',e=>{
   setTab('A');
 })();
 </script>
+
+<div id="confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+  <div style="background:#1565C0;border-radius:12px;padding:28px 32px;min-width:300px;max-width:400px;box-shadow:0 8px 32px rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);text-align:center;">
+    <div style="width:48px;height:48px;border-radius:50%;background:rgba(239,68,68,0.2);border:2px solid #ef4444;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:22px;">⚠️</div>
+    <p id="confirm-msg" style="color:#fff;font-size:16px;font-weight:600;margin:0 0 24px;line-height:1.4;"></p>
+    <div style="display:flex;gap:10px;justify-content:center;">
+      <button id="confirm-cancel" style="flex:1;padding:10px 0;border-radius:8px;border:1px solid rgba(255,255,255,0.3);background:rgba(255,255,255,0.1);color:#fff;font-size:14px;font-weight:600;cursor:pointer;">Cancelar</button>
+      <button id="confirm-ok" style="flex:1;padding:10px 0;border-radius:8px;border:none;background:#ef4444;color:#fff;font-size:14px;font-weight:700;cursor:pointer;">Remover</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function showConfirm(msg){
+  return new Promise(function(resolve){
+    var modal = document.getElementById('confirm-modal');
+    var msgEl = document.getElementById('confirm-msg');
+    var btnOk = document.getElementById('confirm-ok');
+    var btnCancel = document.getElementById('confirm-cancel');
+    msgEl.textContent = msg;
+    modal.style.display = 'flex';
+    function cleanup(val){
+      modal.style.display = 'none';
+      btnOk.removeEventListener('click', onOk);
+      btnCancel.removeEventListener('click', onCancel);
+      resolve(val);
+    }
+    function onOk(){ cleanup(true); }
+    function onCancel(){ cleanup(false); }
+    btnOk.addEventListener('click', onOk);
+    btnCancel.addEventListener('click', onCancel);
+    modal.addEventListener('click', function(e){ if(e.target===modal) cleanup(false); }, {once:true});
+  });
+}
+<\/script>
 </body>
 </html>
