@@ -88,8 +88,8 @@ body{font-family:system-ui,sans-serif;color:var(--text);background:var(--bg);min
 .shelf-item{display:flex;align-items:center;padding:5px 8px;gap:6px;transition:background 0.1s;border-bottom:1px solid var(--border)}
 .shelf-item:last-child{border-bottom:none}
 .shelf-item:hover{background:var(--surface2)}
-.shelf-item.highlighted{background:rgba(239,68,68,0.25)!important;border-left:4px solid #ef4444;border-radius:4px;position:relative;animation:pulse-hl 1.6s ease infinite}
-@keyframes pulse-hl{0%,100%{background:rgba(239,68,68,0.22)}50%{background:rgba(239,68,68,0.5)}} .shelf-item.highlighted::before{content:"📍";position:absolute;right:6px;top:50%;transform:translateY(-50%);font-size:12px;line-height:1}
+.shelf-item.highlighted{background:rgba(239,68,68,0.28)!important;border-left:4px solid #ef4444;border-radius:0 4px 4px 0;animation:pulse-hl 1.6s ease infinite}
+@keyframes pulse-hl{0%,100%{background:rgba(239,68,68,0.22)}50%{background:rgba(239,68,68,0.5)}}
 .item-name{flex:1;font-size:13px;font-weight:600;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item-desc{font-size:11px;color:rgba(255,255,255,0.8);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .item-actions{display:none;gap:2px}
@@ -220,7 +220,7 @@ mark{background:transparent;color:#fff;border-radius:2px;padding:0 2px;font-weig
       <button id="btn-usuarios" onclick="openUsersModal()" style="display:none;padding:6px 12px;border:1px solid rgba(255,255,255,0.2);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(255,255,255,0.08);color:#fff;align-items:center;gap:5px">
         <i class="ti ti-users"></i> Usuários
       </button>
-      <button id="btn-clear-hl" onclick="document.querySelectorAll('.highlighted').forEach(e=>e.classList.remove('highlighted'))" style="display:none;background:rgba(239,68,68,0.2);border:1px solid #ef4444;color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;margin-right:6px">🗑 Limpar marcações</button><button id="btn-login" onclick="openLoginModal()" style="padding:6px 14px;border:1px solid rgba(249,180,45,0.4);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(249,180,45,0.1);color:var(--brand);display:flex;align-items:center;gap:5px;font-weight:500">
+      <button id="btn-clear-hl" onclick="document.querySelectorAll('.highlighted').forEach(function(e){e.classList.remove('highlighted');});this.style.display='none';" style="display:none;background:rgba(239,68,68,0.2);border:1px solid #ef4444;color:#fff;padding:5px 10px;border-radius:6px;font-size:12px;cursor:pointer;align-items:center;gap:4px;margin-right:6px"><i class="ti ti-x" style="font-size:13px"></i> Limpar marcação</button><button id="btn-login" onclick="openLoginModal()" style="padding:6px 14px;border:1px solid rgba(249,180,45,0.4);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(249,180,45,0.1);color:var(--brand);display:flex;align-items:center;gap:5px;font-weight:500">
         <i class="ti ti-lock"></i> Entrar
       </button>
       <button id="btn-logout" onclick="doLogout()" style="display:none;padding:6px 14px;border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius-md);font-size:12px;cursor:pointer;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);align-items:center;gap:5px">
@@ -854,12 +854,7 @@ function goToResult(){
     const el=document.getElementById(`item-${item.id}`);
     if(el){
       el.scrollIntoView({behavior:'smooth',block:'center'});
-      // highlight permanente
-    const btnClear=document.getElementById('btn-clear-hl');
-    if(btnClear) btnClear.style.display='inline-block';
-    // observer para ocultar botão quando não há mais highlights
-    const checkHL=()=>{ if(btnClear && !document.querySelector('.highlighted')) btnClear.style.display='none'; };
-    setTimeout(checkHL,300);
+      setTimeout(()=>el.classList.remove('highlighted'),3200);
     }
   },80);
 }
