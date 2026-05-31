@@ -817,7 +817,7 @@ function renderSmodalDetail(item,term){
         <span><i class="ti ti-stack" style="font-size:12px;margin-right:3px"></i>${getLevelLabel(item.nivel)}</span>
         <span><i class="ti ti-id" style="font-size:12px;margin-right:3px"></i>ID ${item.id}</span>
       </div>
-      ${item.foto_url?`<button onclick="openPhoto('${item.foto_url}','${nomeEscapado}')" style="margin-top:10px;width:100%;background:rgba(249,180,45,0.12);border:1px solid rgba(249,180,45,0.35);color:#ffffff;padding:7px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ti ti-photo" style="font-size:14px"></i> Ver foto</button>`:''}
+      ${item.foto_url?`<button onclick="openPhoto('${item.foto_url}','${nomeEscapado}','${posLabel} \u00b7 ${getLevelLabel(item.nivel)}','${item.nivel}')" style="margin-top:10px;width:100%;background:rgba(249,180,45,0.12);border:1px solid rgba(249,180,45,0.35);color:#ffffff;padding:7px;border-radius:6px;font-size:12px;cursor:pointer;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px"><i class="ti ti-photo" style="font-size:14px"></i> Ver foto</button>`:''}
     </div>
     <div class="sdetail-shelf-card">
       <div class="sdetail-shelf-title"><i class="ti ti-stack-2" style="font-size:12px;margin-right:4px"></i>Prateleira ${posLabel}</div>
