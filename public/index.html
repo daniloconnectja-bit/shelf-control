@@ -567,7 +567,7 @@ function renderGrid(rua){
             ${isAdmin?`<button class="level-add" onclick="event.stopPropagation();openCreate('${rua}','${pos}',${nivel})"><i class="ti ti-plus"></i></button>`:''}
             ${hasItems?`<i class="ti ti-chevron-down level-chevron"></i>`:''}
           </div>
-          <div class="level-items open" id="lvl-${rua}-${pos}-${nivel}">
+          <div class="level-items${!searchTerm||hasItems?' open':''}" id="lvl-${rua}-${pos}-${nivel}">
             ${hasItems?lvItems.map(it=>`
               <div class="shelf-item${hlIds.has(it.id)?' highlighted':''}" id="item-${it.id}">
                 <div style="flex:1;min-width:0">
