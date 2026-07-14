@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Prateleiras 3D</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,sans-serif;background:#87ceeb;overflow:hidden;height:100vh}
+#canvas-wrap{position:fixed;inset:0}
+#hud{position:fixed;top:0;left:0;right:0;padding:12px 16px;background:rgba(16,85,168,0.92);color:#fff;z-index:10;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+#hud h1{font-size:15px;font-weight:700;white-space:nowrap}
+#back-link{color:#fff;text-decoration:none;font-size:12px;display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(255,255,255,0.06);white-space:nowrap}
+#back-link:hover{background:rgba(255,255,255,0.14)}
+#reset-view-btn{color:#fff;font-size:16px;display:flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(255,255,255,0.06);cursor:pointer;flex-shrink:0}
+#reset-view-btn:hover{background:rgba(255,255,255,0.14)}
+#search-box{flex:1;min-width:160px;padding:8px 10px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.08);color:#fff;font-size:14px}
+#search-box::placeholder{color:rgba(255,255,255,0.5)}
+#data-badge{font-size:11px;color:rgba(255,255,255,0.75);white-space:nowrap}
+#data-badge.warn{color:#f9b42d}
+#results{position:fixed;top:56px;left:16px;right:16px;background:#1055A8;border-radius:10px;border:1px solid rgba(255,255,255,0.15);max-height:40vh;overflow-y:auto;z-index:10;display:none}
+#results div{padding:9px 12px;font-size:13px;color:#fff;border-bottom:1px solid rgba(255,255,255,0.08);cursor:pointer}
+#results div:last-child{border-bottom:none}
+#results div:hover{background:rgba(255,255,255,0.1)}
+#results .r-loc{font-size:11px;color:rgba(255,255,255,0.6);margin-top:2px}
+#tooltip{position:fixed;pointer-events:none;background:#1055A8;color:#fff;padding:8px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.2);font-size:12px;z-index:20;display:none;max-width:220px}
+#tooltip .t-name{font-weight:700;font-size:13px}
+#tooltip .t-desc{color:rgba(255,255,255,0.75);margin-top:2px}
+#tooltip .t-loc{color:#f9b42d;font-size:11px;margin-top:4px;font-weight:600}
+#legend{position:fixed;bottom:16px;left:16px;background:rgba(16,85,168,0.9);color:#fff;font-size:11px;padding:8px 12px;border-radius:8px;z-index:10;display:flex;gap:12px;flex-wrap:wrap}
+#legend span{display:flex;align-items:center;gap:5px}
+#legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+#hint{position:fixed;bottom:16px;right:16px;background:rgba(16,85,168,0.9);color:rgba(255,255,255,0.8);font-size:11px;padding:8px 12px;border-radius:8px;z-index:10;max-width:200px;text-align:right}
+#loading{position:fixed;inset:0;background:#87ceeb;display:flex;align-items:center;justify-content:center;z-index:50;color:#1055A8;font-size:14px;font-weight:600}
+#detail-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:40}
+#detail-card{background:#1055A8;border-radius:12px;max-width:320px;width:90%;padding:18px;color:#fff;position:relative;border:1px solid rgba(255,255,255,0.15)}
+#detail-close{position:absolute;top:10px;right:10px;background:none;border:none;color:#fff;font-size:20px;cursor:pointer;line-height:1}
+#detail-card img{width:100%;border-radius:8px;margin-bottom:10px;display:block}
+#detail-card h2{font-size:16px;margin-bottom:6px}
+#detail-card p{font-size:13px;color:rgba(255,255,255,0.8);margin-bottom:10px}
+#detail-card .d-loc{font-size:12px;color:#f9b42d;font-weight:600}
+</style>
+</head>
+<body>
+<div id="loading">Carregando prateleiras...</div>
+<div id="hud">
+  <a id="back-link" href="index.html"><i class="ti ti-arrow-left"></i>Voltar</a>
+  <h1>Prateleiras 3D</h1>
+  <input id="search-box" placeholder="Buscar item..." autocomplete="off">
+  <span id="data-badge"></span>
+  <button id="reset-view-btn" title="Resetar vista"><i class="ti ti-refresh"></i></button>
+</div>
+<div id="results"></div>
+<div id="tooltip"></div>
+<div id="legend">
+  <span><i style="background:#ff2020"></i>Topo</span>
+  <span><i style="background:#ffc800"></i>Meio</span>
+  <span><i style="background:#22cc44"></i>Base</span>
+  <span><i style="background:#f9b42d"></i>Encontrado</span>
+  <span><i style="background:#33475f"></i>Vazio</span>
+</div>
+<div id="hint">Arraste: girar. Scroll/pinca: zoom. Clique numa caixa: detalhes</div>
+<div id="detail-overlay">
+  <div id="detail-card">
+    <button id="detail-close">X</button>
+    <div id="detail-body"></div>
+  </div>
+</div>
+<div id="canvas-wrap"></div>
+
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+
+const RUA_LEVELS = { A:[3,2,1], AF:[1], B:[3,2,1] };
+const seedData = [
+  { id:1, rua:'A', posicao:'01', nivel:3, nome:'Parafusos M8', descricao:'Caixa 500 unidades' },
+  { id:2, rua:'A', posicao:'01', nivel:2, nome:'Porcas M8', descricao:'Saco 1kg' },
+  { id:3, rua:'A', posicao:'01', nivel:1, nome:'Arruelas M8', descricao:'Caixa 1000 unidades' },
+  { id:4, rua:'A', posicao:'02', nivel:3, nome:'Parafusos M10', descricao:'Caixa 200 unidades' },
+  { id:5, rua:'B', posicao:'01', nivel:3, nome:'Disjuntor 63A', descricao:'Tripolar DIN' },
+  { id:6, rua:'AF', posicao:'01', nivel:1, nome:'Cabo PP 2x2.5', descricao:'Rolo 50m' }
+];
+
+const RUA_Z = { A:0, AF:-4.5, B:-9 };
+const RUA_COLOR = { A:0x3b82f6, AF:0x34d399, B:0xa78bfa };
+const NIVEL_COLOR = { 3:0xff2020, 2:0xffc800, 1:0x22cc44 };
+const NIVEL_LABEL = { 3:'Topo', 2:'Meio', 1:'Base' };
+const NIVEL_Y = { 1:0.55, 2:1.85, 3:3.15 };
+const EMPTY_COLOR = 0x33475f;
+const HL_COLOR = 0xf9b42d;
+const SPACING = 1.25;
+const POSICOES = Array.from({length:18},function(_,i){ return String(i+1).padStart(2,'0'); });
+async function loadItems(){
+  try{
+    const res = await fetch('/api/items');
+    if(!res.ok) throw new Error('status '+res.status);
+    const data = await res.json();
+    if(!Array.isArray(data) || !data.length) throw new Error('sem itens');
+    return { items:data, real:true };
+  }catch(e){
+    console.warn('Nao foi possivel carregar /api/items, usando dados de exemplo:', e.message);
+    return { items:seedData, real:false };
+  }
+}
+
+const wrap = document.getElementById('canvas-wrap');
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+scene.fog = new THREE.Fog(0x87ceeb, 20, 60);
+
+const camera = new THREE.PerspectiveCamera(55, innerWidth/innerHeight, 0.1, 200);
+camera.position.set(9, 9, 14);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+wrap.appendChild(renderer.domElement);
+
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.target.set(10, 1.5, -4.5);
+controls.enableDamping = true;
+controls.dampingFactor = 0.08;
+controls.minDistance = 4;
+controls.maxDistance = 40;
+controls.maxPolarAngle = Math.PI/2 - 0.02;
+controls.update();
+const INITIAL_CAM_POS = camera.position.clone();
+const INITIAL_TARGET = controls.target.clone();
+
+function resetView(){
+  const startPos = camera.position.clone();
+  const startTarget = controls.target.clone();
+  const dur = 700;
+  const t0 = performance.now();
+  function step(now){
+    const p = Math.min(1, (now-t0)/dur);
+    const e = p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    camera.position.lerpVectors(startPos, INITIAL_CAM_POS, e);
+    controls.target.lerpVectors(startTarget, INITIAL_TARGET, e);
+    controls.update();
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+document.getElementById('reset-view-btn').addEventListener('click', resetView);
+
+scene.add(new THREE.AmbientLight(0xffffff, 0.75));
+const sun = new THREE.DirectionalLight(0xffffff, 0.9);
+sun.position.set(15, 20, 10);
+scene.add(sun);
+
+const ground = new THREE.Mesh(
+  new THREE.PlaneGeometry(200,200),
+  new THREE.MeshStandardMaterial({ color:0x6fb8dd })
+);
+ground.rotation.x = -Math.PI/2;
+ground.position.y = -0.02;
+scene.add(ground);
+
+function makeLabelSprite(text, colorCss){
+  const canvas = document.createElement('canvas');
+  canvas.width = 512; canvas.height = 128;
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = 'rgba(16,85,168,0.85)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.strokeStyle = colorCss;
+  ctx.lineWidth = 8;
+  ctx.strokeRect(4,4,canvas.width-8,canvas.height-8);
+  ctx.fillStyle = '#ffffff';
+  ctx.font = 'bold 60px system-ui, sans-serif';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, canvas.width/2, canvas.height/2);
+  const tex = new THREE.CanvasTexture(canvas);
+  const mat = new THREE.SpriteMaterial({ map:tex, depthTest:false, transparent:true });
+  const sprite = new THREE.Sprite(mat);
+  sprite.scale.set(4,1,1);
+  return sprite;
+}
+
+function addRuaLabels(){
+  const RUA_NAME = { A:'RUA A', AF:'RUA AF', B:'RUA B' };
+  const RUA_COLOR_CSS = { A:'#3b82f6', AF:'#34d399', B:'#a78bfa' };
+  Object.keys(RUA_LEVELS).forEach(function(rua){
+    const sprite = makeLabelSprite(RUA_NAME[rua], RUA_COLOR_CSS[rua]);
+    sprite.position.set((POSICOES.length*SPACING)/2, 5, RUA_Z[rua]);
+    scene.add(sprite);
+  });
+}
+addRuaLabels();
+
+function addBackdrop(){
+  const loader = new THREE.TextureLoader();
+  loader.load(
+    'warehouse-bg.jpg',
+    function(tex){
+      tex.colorSpace = THREE.SRGBColorSpace;
+      const img = tex.image;
+      const aspect = (img && img.width && img.height) ? img.width/img.height : 16/9;
+      const bdHeight = 14;
+      const bdWidth = bdHeight*aspect;
+      const backdrop = new THREE.Mesh(
+        new THREE.PlaneGeometry(bdWidth, bdHeight),
+        new THREE.MeshBasicMaterial({ map:tex, depthWrite:true })
+      );
+      const bz = RUA_Z.B - 7;
+      backdrop.position.set((POSICOES.length*SPACING)/2, bdHeight/2 - 0.5, bz);
+      scene.add(backdrop);
+      scene.fog = new THREE.Fog(0x87ceeb, 30, 70);
+    },
+    undefined,
+    function(){ console.warn('warehouse-bg.jpg nao encontrado, mantendo fundo padrao'); }
+  );
+}
+addBackdrop();
+const boxGeo = new THREE.BoxGeometry(0.95, 1, 0.95);
+const meshes = [];
+const raycaster = new THREE.Raycaster();
+const mouse = new THREE.Vector2();
+const tooltip = document.getElementById('tooltip');
+let hovered = null;
+let highlighted = [];
+let itemsData = [];
+
+function itemAt(rua,pos,nivel){
+  var found = null;
+  for(var k=0;k<itemsData.length;k++){
+    var i = itemsData[k];
+    if(i.rua===rua && String(i.posicao)===pos && Number(i.nivel)===nivel){ found=i; break; }
+  }
+  return found;
+}
+
+function buildScene(){
+  Object.keys(RUA_LEVELS).forEach(function(rua){
+    const z = RUA_Z[rua];
+    const stripe = new THREE.Mesh(
+      new THREE.PlaneGeometry(POSICOES.length*SPACING, 3),
+      new THREE.MeshStandardMaterial({ color:RUA_COLOR[rua], transparent:true, opacity:0.25 })
+    );
+    stripe.rotation.x = -Math.PI/2;
+    stripe.position.set((POSICOES.length*SPACING)/2, -0.01, z);
+    scene.add(stripe);
+
+    RUA_LEVELS[rua].forEach(function(nivel){
+      POSICOES.forEach(function(pos, idx){
+        const item = itemAt(rua,pos,nivel);
+        const mat = new THREE.MeshStandardMaterial({
+          color: item ? NIVEL_COLOR[nivel] : EMPTY_COLOR,
+          transparent: !item,
+          opacity: item ? 1 : 0.35
+        });
+        const mesh = new THREE.Mesh(boxGeo, mat);
+        mesh.position.set(idx*SPACING + SPACING/2, NIVEL_Y[nivel], z);
+        mesh.userData = { rua:rua, posicao:pos, nivel:nivel, item:item, baseColor:mat.color.getHex(), baseOpacity:mat.opacity };
+        scene.add(mesh);
+        meshes.push(mesh);
+      });
+    });
+  });
+}
+function setMouse(e){
+  const t = e.touches ? e.touches[0] : e;
+  mouse.x = (t.clientX/innerWidth)*2-1;
+  mouse.y = -(t.clientY/innerHeight)*2+1;
+  return t;
+}
+
+function showTooltip(clientX, clientY, d){
+  const loc = 'Rua ' + d.rua + ' - Posicao ' + d.posicao + ' - ' + NIVEL_LABEL[d.nivel];
+  if(d.item){
+    tooltip.innerHTML = '<div class="t-name">'+d.item.nome+'</div>' + (d.item.descricao?('<div class="t-desc">'+d.item.descricao+'</div>'):'') + '<div class="t-loc">'+loc+'</div>';
+  } else {
+    tooltip.innerHTML = '<div class="t-name">Nenhum item</div><div class="t-loc">'+loc+'</div>';
+  }
+  tooltip.style.display = 'block';
+  tooltip.style.left = Math.min(clientX+14, innerWidth-230)+'px';
+  tooltip.style.top = Math.min(clientY+14, innerHeight-90)+'px';
+}
+
+renderer.domElement.addEventListener('mousemove', function(e){
+  const t = setMouse(e);
+  raycaster.setFromCamera(mouse, camera);
+  const hit = raycaster.intersectObjects(meshes)[0];
+  if(hit){
+    if(hovered && hovered!==hit.object) hovered.scale.set(1,1,1);
+    hovered = hit.object;
+    hovered.scale.set(1.08,1.08,1.08);
+    showTooltip(t.clientX, t.clientY, hovered.userData);
+    renderer.domElement.style.cursor='pointer';
+  } else {
+    if(hovered) hovered.scale.set(1,1,1);
+    hovered = null;
+    tooltip.style.display='none';
+    renderer.domElement.style.cursor='grab';
+  }
+});
+
+const detailOverlay = document.getElementById('detail-overlay');
+const detailBody = document.getElementById('detail-body');
+function openDetail(d){
+  const loc = 'Rua ' + d.rua + ' - Posicao ' + d.posicao + ' - ' + NIVEL_LABEL[d.nivel];
+  if(d.item){
+    detailBody.innerHTML =
+      (d.item.foto_url?('<img src="'+d.item.foto_url+'" alt="">'):'') +
+      '<h2>'+d.item.nome+'</h2>' +
+      (d.item.descricao?('<p>'+d.item.descricao+'</p>'):'') +
+      '<div class="d-loc">'+loc+'</div>';
+  } else {
+    detailBody.innerHTML = '<h2>Nenhum item</h2><div class="d-loc">'+loc+'</div>';
+  }
+  detailOverlay.style.display='flex';
+}
+document.getElementById('detail-close').addEventListener('click', function(){ detailOverlay.style.display='none'; });
+detailOverlay.addEventListener('click', function(e){ if(e.target===detailOverlay) detailOverlay.style.display='none'; });
+
+renderer.domElement.addEventListener('click', function(){
+  if(!hovered) return;
+  openDetail(hovered.userData);
+});
+const searchBox = document.getElementById('search-box');
+const resultsEl = document.getElementById('results');
+
+function clearHighlight(){
+  highlighted.forEach(function(m){
+    m.material.color.setHex(m.userData.baseColor);
+    m.material.opacity = m.userData.baseOpacity;
+  });
+  highlighted = [];
+}
+
+searchBox.addEventListener('input', function(){
+  const term = searchBox.value.trim().toLowerCase();
+  clearHighlight();
+  if(!term){ resultsEl.style.display='none'; return; }
+  const matches = itemsData.filter(function(i){
+    return i.nome.toLowerCase().includes(term) || (i.descricao||'').toLowerCase().includes(term);
+  });
+  if(!matches.length){
+    resultsEl.style.display='block';
+    resultsEl.innerHTML = '<div style="cursor:default">Nenhum item encontrado</div>';
+    return;
+  }
+  resultsEl.style.display='block';
+  resultsEl.innerHTML = matches.map(function(m){
+    return '<div data-id="'+m.id+'"><div>'+m.nome+'</div><div class="r-loc">Rua '+m.rua+' - Posicao '+m.posicao+' - '+NIVEL_LABEL[m.nivel]+'</div></div>';
+  }).join('');
+  matches.forEach(function(m){
+    const mesh = meshes.find(function(mm){ return mm.userData.item && mm.userData.item.id===m.id; });
+    if(mesh){
+      mesh.material.color.setHex(HL_COLOR);
+      mesh.material.opacity = 1;
+      highlighted.push(mesh);
+    }
+  });
+});
+
+resultsEl.addEventListener('click', function(e){
+  const row = e.target.closest('div[data-id]');
+  if(!row) return;
+  const id = row.dataset.id;
+  const mesh = meshes.find(function(mm){ return mm.userData.item && String(mm.userData.item.id)===id; });
+  if(mesh) flyTo(mesh.position);
+});
+
+function flyTo(target){
+  const startPos = camera.position.clone();
+  const startTarget = controls.target.clone();
+  const endTarget = target.clone();
+  const dir = new THREE.Vector3().subVectors(startPos, startTarget).normalize();
+  const endPos = endTarget.clone().add(dir.multiplyScalar(6));
+  endPos.y = Math.max(endPos.y, target.y+3);
+  const dur = 900;
+  const t0 = performance.now();
+  function step(now){
+    const p = Math.min(1, (now-t0)/dur);
+    const e = p<0.5 ? 2*p*p : 1-Math.pow(-2*p+2,2)/2;
+    camera.position.lerpVectors(startPos, endPos, e);
+    controls.target.lerpVectors(startTarget, endTarget, e);
+    controls.update();
+    if(p<1) requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+function animate(){
+  requestAnimationFrame(animate);
+  controls.update();
+  renderer.render(scene, camera);
+}
+
+addEventListener('resize', function(){
+  camera.aspect = innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth, innerHeight);
+});
+
+(function init(){
+  loadItems().then(function(result){
+    itemsData = result.items;
+    const badge = document.getElementById('data-badge');
+    if(result.real){
+      badge.textContent = itemsData.length + ' itens do seu banco';
+    } else {
+      badge.textContent = 'Nao achou /api/items - mostrando exemplo';
+      badge.classList.add('warn');
+    }
+    buildScene();
+    document.getElementById('loading').style.display='none';
+    animate();
+  });
+})();
+</script>
+</body>
+</html>
